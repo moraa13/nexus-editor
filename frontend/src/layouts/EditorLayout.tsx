@@ -10,21 +10,29 @@ interface EditorLayoutProps {
 
 export default function EditorLayout({ sidebar, main, right, bottom }: EditorLayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
       <Navbar />
-      <div className="grid grid-rows-[1fr_auto] h-[calc(100vh-48px)]">
-        <div className="grid grid-cols-[320px_1fr_380px] gap-4 p-4">
-          <aside className="overflow-hidden">
+      <div className="flex flex-col h-[calc(100vh-64px)]">
+        {/* Main Content Area */}
+        <div className="flex-1 flex max-w-screen-xl mx-auto gap-6 p-6 min-h-0 w-full">
+          {/* Left Sidebar */}
+          <aside className="w-80 flex-shrink-0">
             {sidebar}
           </aside>
-          <main className="overflow-hidden">
+          
+          {/* Center Main Area */}
+          <main className="flex-1 min-w-0">
             {main}
           </main>
-          <section className="overflow-hidden">
+          
+          {/* Right Properties Panel */}
+          <section className="w-96 flex-shrink-0">
             {right}
           </section>
         </div>
-        <div className="p-4 pt-0">
+        
+        {/* Bottom Panel */}
+        <div className="border-t border-white/10 bg-white/5 backdrop-blur-sm">
           {bottom}
         </div>
       </div>

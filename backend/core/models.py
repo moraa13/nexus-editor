@@ -156,3 +156,100 @@ class Post(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.speaker or '—'}: {self.text[:40]}"
+
+
+# Skill Check System Models
+
+class SkillCheck(BaseModel):
+    """Модель для диалоговых проверок характеристик"""
+    SKILL_CHOICES = [
+        ('logic', 'Logic'),
+        ('encyclopedia', 'Encyclopedia'),
+        ('rhetoric', 'Rhetoric'),
+        ('drama', 'Drama'),
+        ('conceptualization', 'Conceptualization'),
+        ('visual_calculus', 'Visual Calculus'),
+        ('volition', 'Volition'),
+        ('inland_empire', 'Inland Empire'),
+        ('empathy', 'Empathy'),
+        ('authority', 'Authority'),
+        ('suggestion', 'Suggestion'),
+        ('espirit_de_corps', 'Espirit de Corps'),
+        ('endurance', 'Endurance'),
+        ('pain_threshold', 'Pain Threshold'),
+        ('physical_instrument', 'Physical Instrument'),
+        ('electrochemistry', 'Electrochemistry'),
+        ('shivers', 'Shivers'),
+        ('half_light', 'Half Light'),
+        ('hand_eye_coordination', 'Hand/Eye Coordination'),
+        ('perception', 'Perception'),
+        ('reaction_speed', 'Reaction Speed'),
+        ('savoir_faire', 'Savoir Faire'),
+        ('interfacing', 'Interfacing'),
+        ('composure', 'Composure'),
+    ]
+    
+    DIFFICULTY_CHOICES = [
+        ('trivial', 'Trivial (5)'),
+        ('easy', 'Easy (10)'),
+        ('medium', 'Medium (15)'),
+        ('hard', 'Hard (20)'),
+        ('extreme', 'Extreme (25)'),
+        ('impossible', 'Impossible (30)'),
+    ]
+    
+    dialogue = models.ForeignKey(Dialogue, on_delete=models.CASCADE, related_name="skill_checks")
+    skill = models.CharField(max_length=30, choices=SKILL_CHOICES)
+    difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, default='medium')
+    dc_value = models.IntegerField(default=15)  # Difficulty Class value
+    description = models.TextField(blank=True)
+    success_text = models.TextField(blank=True)
+    failure_text = models.TextField(blank=True)
+    critical_success_text = models.TextField(blank=True)
+    critical_failure_text = models.TextField(blank=True)
+    
+    def get_dc_value(self):
+        """Возвращает числовое значение DC на основе выбранной сложности"""
+        dc_map = {
+            'trivial': 5,
+            'easy': 10,
+            'medium': 15,
+            'hard': 20,
+            'extreme': 25,
+            'impossible': 30,
+        }
+        return dc_map.get(self.difficulty, self.dc_value)
+    
+    def __str__(self) -> str:
+        return f"{self.skill.title()} check (DC {self.get_dc_value()}) in {self.dialogue.title}"
+
+
+class DialogueOption(BaseModel):
+    """Опции диалога с привязкой к skill check"""
+    dialogue = models.ForeignKey(Dialogue, on_delete=models.CASCADE, related_name="options")
+    text = models.TextField()
+    skill_check = models.ForeignKey(SkillCheck, on_delete=models.SET_NULL, null=True, blank=True, related_name="options")
+    order = models.IntegerField(default=0)
+    is_available = models.BooleanField(default=True)
+    
+    class Meta:
+        ordering = ["order", "created_at"]
+    
+    def __str__(self) -> str:
+        return f"Option: {self.text[:30]}"
+
+
+class RollResult(BaseModel):
+    """Результат броска кубика для skill check"""
+    skill_check = models.ForeignKey(SkillCheck, on_delete=models.CASCADE, related_name="roll_results")
+    character = models.ForeignKey(Character, on_delete=models.CASCADE, related_name="roll_results")
+    dice_roll = models.IntegerField()  # Результат d20
+    skill_value = models.IntegerField()  # Значение характеристики персонажа
+    total = models.IntegerField()  # dice_roll + skill_value
+    is_success = models.BooleanField()
+    is_critical_success = models.BooleanField(default=False)
+    is_critical_failure = models.BooleanField(default=False)
+    result_text = models.TextField(blank=True)
+    
+    def __str__(self) -> str:
+        return f"{self.character.name}: {self.dice_roll}+{self.skill_value}={self.total} ({'Success' if self.is_success else 'Failure'})"

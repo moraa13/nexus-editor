@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from .models import Project, UserProfile, GameProject, DialogueNode, DialogueLink, CharacterStat, Character, NPC, Dialogue, Post
+from .models import (
+    Project, UserProfile, GameProject, DialogueNode, DialogueLink, CharacterStat, 
+    Character, NPC, Dialogue, Post, SkillCheck, DialogueOption, RollResult
+)
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,4 +61,32 @@ class DialogueSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
+        fields = "__all__"
+
+
+class SkillCheckSerializer(serializers.ModelSerializer):
+    dc_value_display = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = SkillCheck
+        fields = "__all__"
+    
+    def get_dc_value_display(self, obj):
+        return obj.get_dc_value()
+
+
+class DialogueOptionSerializer(serializers.ModelSerializer):
+    skill_check_details = SkillCheckSerializer(source='skill_check', read_only=True)
+    
+    class Meta:
+        model = DialogueOption
+        fields = "__all__"
+
+
+class RollResultSerializer(serializers.ModelSerializer):
+    character_name = serializers.CharField(source='character.name', read_only=True)
+    skill_check_details = SkillCheckSerializer(source='skill_check', read_only=True)
+    
+    class Meta:
+        model = RollResult
         fields = "__all__"

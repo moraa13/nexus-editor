@@ -3,7 +3,9 @@ from django.urls import path
 from .views import (
     ProjectViewSet, UserProfileViewSet,
     GameProjectViewSet, DialogueNodeViewSet, DialogueLinkViewSet, CharacterStatViewSet,
-    CharacterViewSet, NPCViewSet, DialogueViewSet, PostViewSet, generate_replicas,
+    CharacterViewSet, NPCViewSet, DialogueViewSet, PostViewSet, 
+    SkillCheckViewSet, DialogueOptionViewSet, RollResultViewSet,
+    generate_replicas, roll_skill_check, get_character_skills,
 )
 
 router = DefaultRouter()
@@ -17,8 +19,14 @@ router.register("characters", CharacterViewSet, basename="character")
 router.register("npcs", NPCViewSet, basename="npc")
 router.register("dialogues", DialogueViewSet, basename="dialogue")
 router.register("posts", PostViewSet, basename="post")
+router.register("skill-checks", SkillCheckViewSet, basename="skillcheck")
+router.register("dialogue-options", DialogueOptionViewSet, basename="dialogueoption")
+router.register("roll-results", RollResultViewSet, basename="rollresult")
+
 urlpatterns = [
     path("generate_replicas/", generate_replicas),
+    path("roll_skill_check/", roll_skill_check),
+    path("characters/<uuid:character_id>/skills/", get_character_skills),
 ]
 urlpatterns += router.urls
 

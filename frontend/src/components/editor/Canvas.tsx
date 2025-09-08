@@ -48,16 +48,11 @@ const nodeTypes = {
 };
 
 const initialNodes: Node<NodeData>[] = [
-  { id: "n1", position: { x: 80, y: 80 }, data: { label: "Intro", text: "Начало разговора у костра.", type: "post" }, type: "post" },
-  { id: "n2", position: { x: 360, y: 80 }, data: { label: "Choice A", text: "Спросить про дорогу.", type: "post" }, type: "post" },
-  { id: "n3", position: { x: 360, y: 220 }, data: { label: "Choice B", text: "Помолчать и кивнуть.", type: "post" }, type: "post" },
-  { id: "c1", position: { x: 80, y: 220 }, data: { label: "Герой", type: "character", isNPC: false }, type: "character" },
-  { id: "c2", position: { x: 80, y: 20 }, data: { label: "Старец", type: "character", isNPC: true }, type: "character" },
+  // Start with empty canvas to show welcome message
 ];
 
 const initialEdges: Edge[] = [
-  { id: "e1", source: "n1", target: "n2", label: "→", markerEnd: { type: "arrow" }, animated: false },
-  { id: "e2", source: "n1", target: "n3", label: "→", markerEnd: { type: "arrow" }, animated: false },
+  // Start with empty edges
 ];
 
 export default function Canvas() {
@@ -111,28 +106,63 @@ export default function Canvas() {
   }, []);
 
   return (
-    <div className="h-full bg-gray-900 border border-gray-700 rounded-xl p-4">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">🎯</span>
-          <h2 className="text-lg font-semibold text-white">Dialogue Canvas</h2>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" onClick={centerView} className="text-gray-300 hover:text-white">
-            Center
-          </Button>
-          <Button 
-            variant="danger" 
-            onClick={deleteSelected} 
-            disabled={selectedNodeIds.length + selectedEdgeIds.length === 0}
-            className="text-gray-300 hover:text-white"
-          >
-            Delete
-          </Button>
+    <div className="h-full bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden flex flex-col">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/50 border-b border-white/10 p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
+              <span className="text-lg">🎯</span>
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Dialogue Canvas</h2>
+              <p className="text-xs text-gray-400">Visual node editor for dialogue flow</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              onClick={centerView} 
+              className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
+              Center
+            </Button>
+            <Button 
+              variant="danger" 
+              onClick={deleteSelected} 
+              disabled={selectedNodeIds.length + selectedEdgeIds.length === 0}
+              className="text-gray-300 hover:text-white hover:bg-red-500/20 transition-all duration-200"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Delete
+            </Button>
+          </div>
         </div>
       </div>
-      <div className="h-[calc(100%-60px)] relative rounded-lg border border-gray-600 bg-gray-800/50 overflow-hidden">
-        <ReactFlow
+      
+      {/* Canvas Area */}
+      <div className="flex-1 relative bg-gradient-to-br from-gray-900/50 to-gray-800/50">
+        {nodes.length === 0 ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center text-gray-400">
+              <div className="w-16 h-16 mx-auto mb-4 bg-white/5 rounded-xl flex items-center justify-center">
+                <span className="text-2xl">🎯</span>
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Welcome to Dialogue Canvas</h3>
+              <p className="text-sm text-gray-400 mb-4">Select a dialogue from the sidebar to start editing</p>
+              <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+                <span>💡</span>
+                <span>Tip: Use the sidebar to manage your scenes, characters, and dialogues</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <ReactFlow
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
@@ -153,24 +183,33 @@ export default function Canvas() {
           <MiniMap 
             pannable 
             zoomable 
-            style={{ backgroundColor: "#1f2937" }} 
-            maskColor="#1f2937" 
-            nodeStrokeColor="#6b7280" 
-            nodeColor="#374151" 
-            className="border border-gray-600"
+            style={{ 
+              backgroundColor: "rgba(17, 24, 39, 0.8)", 
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              borderRadius: "8px"
+            }} 
+            maskColor="rgba(17, 24, 39, 0.8)" 
+            nodeStrokeColor="#6366f1" 
+            nodeColor="#4f46e5" 
+            className="border border-white/10"
           />
           <Controls 
             position="bottom-right" 
             showInteractive={false}
-            style={{ backgroundColor: "#374151", border: "1px solid #6b7280" }}
+            style={{ 
+              backgroundColor: "rgba(17, 24, 39, 0.8)", 
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              borderRadius: "8px"
+            }}
           />
           <Background 
-            color="#4b5563" 
-            gap={24} 
-            variant="lines" 
+            color="rgba(255, 255, 255, 0.05)" 
+            gap={32} 
+            variant="dots" 
             size={1}
           />
         </ReactFlow>
+        )}
       </div>
     </div>
   );
