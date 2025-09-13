@@ -470,7 +470,6 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                       <p>• <span className="text-purple-300">История</span> — личная история персонажа</p>
                       <p>• <span className="text-green-300">Навыки</span> — связанные умения и способности</p>
                     </div>
-                    </div>
 
                   {/* Current Game Setting */}
                   <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 p-4 rounded-lg border border-purple-500/30">
@@ -484,8 +483,7 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                       <p><span className="text-white">Стиль:</span> {gameSetting.narrativeStyle}</p>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
         </div>
         
         {/* Toast Container */}
