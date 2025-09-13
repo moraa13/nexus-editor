@@ -323,7 +323,6 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                   </div>
               </div>
             )}
-            </div>
         </div>
 
         {/* Right Context Panel - Fixed Position */}
@@ -487,7 +486,7 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                 </div>
               </div>
             )}
-          </div>
+        </div>
         
         {/* Toast Container */}
         <ToastContainer />
