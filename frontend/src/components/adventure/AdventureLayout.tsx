@@ -471,8 +471,8 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                       <p>• <span className="text-green-300">Навыки</span> — связанные умения и способности</p>
                     </div>
 
-                  {/* Current Game Setting */}
-                  <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 p-4 rounded-lg border border-purple-500/30">
+                    {/* Current Game Setting */}
+                    <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 p-4 rounded-lg border border-purple-500/30">
                     <h5 className="text-sm font-semibold text-purple-300 mb-2 flex items-center gap-2">
                       <span>🎭</span>
                       Текущий стиль игры
@@ -481,11 +481,11 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                       <p><span className="text-white">Жанр:</span> {gameSetting.genre}</p>
                       <p><span className="text-white">Тон:</span> {gameSetting.emotionalTone}</p>
                       <p><span className="text-white">Стиль:</span> {gameSetting.narrativeStyle}</p>
-                    </div>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+          </div>
           )}
         </div>
         
