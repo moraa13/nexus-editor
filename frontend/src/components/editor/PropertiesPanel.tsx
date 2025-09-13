@@ -8,7 +8,7 @@ export default function PropertiesPanel() {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleSave = () => {
-    // TODO: Save to API
+    // Save to API - implementation needed
     setIsEditing(false);
   };
 

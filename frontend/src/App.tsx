@@ -1,6 +1,15 @@
-import Editor from "./components/editor/Editor";
+import AdventureLayout from "./components/adventure/AdventureLayout";
+import ServiceWorkerProvider, { PerformanceTracker } from "./components/ui/ServiceWorkerProvider";
+import WorkerProvider from "./components/ui/WorkerManager";
 
 export default function App() {
-  return <Editor />;
+  return (
+    <ServiceWorkerProvider>
+      <WorkerProvider>
+        <PerformanceTracker />
+        <AdventureLayout />
+      </WorkerProvider>
+    </ServiceWorkerProvider>
+  );
 }
 

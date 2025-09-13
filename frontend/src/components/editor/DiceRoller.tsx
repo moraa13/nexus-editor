@@ -9,8 +9,10 @@ import {
   SKILL_CHOICES
 } from "../../api/skillCheck";
 import { listCharacters } from "../../api/character";
+import { generateDialogueResult, generatePlayerResponses, logDialogueEvent } from "../../api/quest";
 import type { Character } from "../../api/character";
 import type { SkillCheck, RollResponse } from "../../api/skillCheck";
+import type { DialogueResult, PlayerResponses } from "../../api/quest";
 
 interface DiceRollerProps {
   dialogueId?: string;
@@ -23,6 +25,10 @@ export default function DiceRoller({ dialogueId }: DiceRollerProps) {
   const [selectedSkillCheck, setSelectedSkillCheck] = useState<SkillCheck | null>(null);
   const [characterSkills, setCharacterSkills] = useState<Record<string, number>>({});
   const [rollResult, setRollResult] = useState<RollResponse | null>(null);
+  const [dialogueResult, setDialogueResult] = useState<DialogueResult | null>(null);
+  const [playerResponses, setPlayerResponses] = useState<PlayerResponses | null>(null);
+  const [selectedTrait, setSelectedTrait] = useState<string>("neutral");
+  const [questContext, setQuestContext] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -76,17 +82,63 @@ export default function DiceRoller({ dialogueId }: DiceRollerProps) {
     setLoading(true);
     setError(null);
     setRollResult(null);
+    setDialogueResult(null);
+    setPlayerResponses(null);
 
     try {
-      const response = await rollSkillCheck({
+      // Roll the skill check
+      const rollResponse = await rollSkillCheck({
         character_id: selectedCharacter.id,
         skill_check_id: selectedSkillCheck.id
       });
-      setRollResult(response.data);
+      setRollResult(rollResponse.data);
+
+      // Generate dialogue result based on roll
+      const dialogueResponse = await generateDialogueResult({
+        dice_result: rollResponse.data.dice_roll,
+        character_trait: selectedTrait,
+        quest_context: questContext,
+        character_id: selectedCharacter.id
+      });
+      setDialogueResult(dialogueResponse.data);
+
+      // Log the event
+      await logDialogueEvent({
+        character_id: selectedCharacter.id,
+        log_type: "dice_roll",
+        author: selectedCharacter.name,
+        content: `Rolled ${rollResponse.data.dice_roll} + ${rollResponse.data.skill_value} = ${rollResponse.data.total} (DC ${rollResponse.data.dc_value})`,
+        result: rollResponse.data.is_success ? "success" : "failure",
+        metadata: {
+          skill: rollResponse.data.skill,
+          dice_roll: rollResponse.data.dice_roll,
+          skill_value: rollResponse.data.skill_value,
+          total: rollResponse.data.total,
+          dc_value: rollResponse.data.dc_value,
+          is_critical_success: rollResponse.data.is_critical_success,
+          is_critical_failure: rollResponse.data.is_critical_failure
+        }
+      });
+
     } catch (e: any) {
       setError(e?.response?.data?.error || e?.message || "Failed to roll dice");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGeneratePlayerResponses = async () => {
+    if (!dialogueResult || !selectedCharacter?.id) return;
+
+    try {
+      const response = await generatePlayerResponses({
+        character_id: selectedCharacter.id,
+        npc_response: dialogueResult.npc_response,
+        character_traits: [selectedTrait]
+      });
+      setPlayerResponses(response.data);
+    } catch (e: any) {
+      setError(e?.response?.data?.error || e?.message || "Failed to generate player responses");
     }
   };
 
@@ -172,6 +224,36 @@ export default function DiceRoller({ dialogueId }: DiceRollerProps) {
               </option>
             ))}
           </Select>
+        </div>
+
+        {/* Character Trait Selection */}
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-gray-300">Character Trait</label>
+          <Select 
+            value={selectedTrait} 
+            onChange={(e) => setSelectedTrait(e.target.value)}
+            className="w-full bg-white/5 border-white/10 text-white focus:border-yellow-500 focus:ring-yellow-500/20"
+          >
+            <option value="neutral">Neutral</option>
+            <option value="манипулятивный">Манипулятивный</option>
+            <option value="наивный">Наивный</option>
+            <option value="агрессивный">Агрессивный</option>
+            <option value="миролюбивый">Миролюбивый</option>
+            <option value="циничный">Циничный</option>
+            <option value="оптимистичный">Оптимистичный</option>
+          </Select>
+        </div>
+
+        {/* Quest Context */}
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-gray-300">Quest Context</label>
+          <input
+            type="text"
+            value={questContext}
+            onChange={(e) => setQuestContext(e.target.value)}
+            placeholder="Enter quest context or situation..."
+            className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:border-yellow-500 focus:ring-yellow-500/20 rounded-lg"
+          />
         </div>
 
         {/* Character Skills Display */}
@@ -260,6 +342,97 @@ export default function DiceRoller({ dialogueId }: DiceRollerProps) {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Dialogue Result */}
+        {dialogueResult && (
+          <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-2xl">💬</span>
+              <div>
+                <h3 className="text-lg font-semibold text-white">NPC Response</h3>
+                <p className="text-xs text-gray-400">Based on {dialogueResult.character_trait} trait</p>
+              </div>
+            </div>
+
+            <div className="p-3 bg-white/5 rounded-lg mb-4">
+              <div className="text-sm text-gray-300 leading-relaxed">
+                {dialogueResult.npc_response}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 mb-3">
+              <span className={`text-xs px-2 py-1 rounded-full ${
+                dialogueResult.success ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
+              }`}>
+                {dialogueResult.success ? "Success" : "Failure"}
+              </span>
+              <span className="text-xs text-gray-400">
+                Roll: {dialogueResult.dice_result}
+              </span>
+            </div>
+
+            <Button 
+              onClick={handleGeneratePlayerResponses}
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium py-2 rounded-lg transition-all duration-200"
+            >
+              Generate Player Responses
+            </Button>
+          </div>
+        )}
+
+        {/* Player Responses */}
+        {playerResponses && (
+          <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-2xl">🎭</span>
+              <div>
+                <h3 className="text-lg font-semibold text-white">Player Response Options</h3>
+                <p className="text-xs text-gray-400">Choose your response as {playerResponses.character_name}</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {playerResponses.responses.map((response, index) => (
+                <div key={index} className="p-3 bg-white/5 rounded-lg border border-white/10 hover:border-white/20 transition-colors cursor-pointer">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="text-sm text-gray-300 leading-relaxed mb-2">
+                        {response.text}
+                      </div>
+                      {response.requires_roll && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-full">
+                            Requires {response.skill_type} check
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <Button 
+                      className="px-3 py-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white text-xs rounded-lg transition-all duration-200"
+                      onClick={() => {
+                        // Log player response
+                        logDialogueEvent({
+                          character_id: selectedCharacter?.id,
+                          log_type: "dialogue",
+                          author: "Player",
+                          content: response.text,
+                          result: response.requires_roll ? "pending_roll" : "neutral",
+                          metadata: {
+                            response_index: index,
+                            requires_roll: response.requires_roll,
+                            skill_type: response.skill_type
+                          }
+                        });
+                      }}
+                    >
+                      Choose
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

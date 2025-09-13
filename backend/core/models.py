@@ -1,6 +1,8 @@
 import uuid
 from django.conf import settings
 from django.db import models
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -94,34 +96,34 @@ class CharacterStat(BaseModel):
 class Character(BaseModel):
     name = models.CharField(max_length=200)
     portrait = models.URLField(blank=True)
-    # 24 characteristics (integers)
-    logic = models.IntegerField(default=2)
-    encyclopedia = models.IntegerField(default=2)
-    rhetoric = models.IntegerField(default=2)
-    drama = models.IntegerField(default=2)
-    conceptualization = models.IntegerField(default=2)
-    visual_calculus = models.IntegerField(default=2)
+    # 24 characteristics (integers) with validation
+    logic = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    encyclopedia = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    rhetoric = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    drama = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    conceptualization = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    visual_calculus = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
 
-    volition = models.IntegerField(default=2)
-    inland_empire = models.IntegerField(default=2)
-    empathy = models.IntegerField(default=2)
-    authority = models.IntegerField(default=2)
-    suggestion = models.IntegerField(default=2)
-    espirit_de_corps = models.IntegerField(default=2)
+    volition = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    inland_empire = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    empathy = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    authority = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    suggestion = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    espirit_de_corps = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
 
-    endurance = models.IntegerField(default=2)
-    pain_threshold = models.IntegerField(default=2)
-    physical_instrument = models.IntegerField(default=2)
-    electrochemistry = models.IntegerField(default=2)
-    shivers = models.IntegerField(default=2)
-    half_light = models.IntegerField(default=2)
+    endurance = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    pain_threshold = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    physical_instrument = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    electrochemistry = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    shivers = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    half_light = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
 
-    hand_eye_coordination = models.IntegerField(default=2)
-    perception = models.IntegerField(default=2)
-    reaction_speed = models.IntegerField(default=2)
-    savoir_faire = models.IntegerField(default=2)
-    interfacing = models.IntegerField(default=2)
-    composure = models.IntegerField(default=2)
+    hand_eye_coordination = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    perception = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    reaction_speed = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    savoir_faire = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    interfacing = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
+    composure = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
 
     def __str__(self) -> str:
         return self.name
@@ -150,12 +152,45 @@ class Post(BaseModel):
     text = models.TextField()
     is_generated = models.BooleanField(default=False)
     order = models.IntegerField(default=0)
+    
+    # Ветвление
+    has_options = models.BooleanField(default=False, help_text="Есть ли у этого поста опции ответа")
+    is_branching_point = models.BooleanField(default=False, help_text="Является ли точкой ветвления")
+    
+    # Визуальные настройки
+    post_type = models.CharField(
+        max_length=20, 
+        choices=[
+            ('statement', 'Утверждение'),
+            ('question', 'Вопрос'),
+            ('action', 'Действие'),
+            ('narration', 'Повествование'),
+        ],
+        default='statement'
+    )
+    color = models.CharField(max_length=7, default="#6B7280", help_text="Цвет поста")
+    icon = models.CharField(max_length=50, default="💬", help_text="Иконка поста")
 
     class Meta:
         ordering = ["order", "created_at"]
 
     def __str__(self) -> str:
         return f"{self.speaker or '—'}: {self.text[:40]}"
+    
+    def get_available_options(self, character=None):
+        """Получает доступные опции для этого поста"""
+        if not self.has_options:
+            return []
+        
+        options = DialogueOption.objects.filter(
+            dialogue=self.dialogue,
+            order__gte=self.order
+        ).order_by('order')
+        
+        if character:
+            return [opt for opt in options if opt.is_accessible(character)]
+        
+        return options
 
 
 # Skill Check System Models
@@ -225,18 +260,128 @@ class SkillCheck(BaseModel):
 
 
 class DialogueOption(BaseModel):
-    """Опции диалога с привязкой к skill check"""
+    """Опции диалога с привязкой к skill check и ветвлением"""
+    OPTION_TYPES = [
+        ('response', 'Ответ игрока'),
+        ('choice', 'Выбор действия'),
+        ('skill_check', 'Проверка навыка'),
+        ('condition', 'Условный переход'),
+    ]
+    
+    # Основные поля
     dialogue = models.ForeignKey(Dialogue, on_delete=models.CASCADE, related_name="options")
-    text = models.TextField()
+    text = models.TextField(help_text="Текст опции")
+    option_type = models.CharField(max_length=20, choices=OPTION_TYPES, default='response')
+    order = models.IntegerField(default=0, help_text="Порядок отображения")
+    is_available = models.BooleanField(default=True, help_text="Доступна ли опция")
+    
+    # Ветвление
+    next_dialogue = models.ForeignKey(
+        Dialogue, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name="previous_options",
+        help_text="Следующий диалог при выборе этой опции"
+    )
+    next_post = models.ForeignKey(
+        'Post',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="previous_options",
+        help_text="Следующий пост при выборе этой опции"
+    )
+    
+    # Условия и проверки
     skill_check = models.ForeignKey(SkillCheck, on_delete=models.SET_NULL, null=True, blank=True, related_name="options")
-    order = models.IntegerField(default=0)
-    is_available = models.BooleanField(default=True)
+    required_skill = models.CharField(max_length=30, blank=True, help_text="Требуемый навык")
+    required_skill_value = models.IntegerField(null=True, blank=True, help_text="Минимальное значение навыка")
+    
+    # Дополнительные условия
+    condition_text = models.TextField(blank=True, help_text="Условие доступности опции")
+    condition_met = models.BooleanField(default=True, help_text="Выполнено ли условие")
+    
+    # Визуальные настройки
+    color = models.CharField(max_length=7, default="#3B82F6", help_text="Цвет опции в hex формате")
+    icon = models.CharField(max_length=50, default="💬", help_text="Иконка опции")
+    
+    # Интеграция с квестами
+    quest_trigger = models.ForeignKey('Quest', on_delete=models.SET_NULL, null=True, blank=True, related_name="trigger_options")
+    quest_completion = models.ForeignKey('Quest', on_delete=models.SET_NULL, null=True, blank=True, related_name="completion_options")
+    quest_objective_trigger = models.ForeignKey('QuestObjective', on_delete=models.SET_NULL, null=True, blank=True, related_name="trigger_options")
+    quest_objective_completion = models.ForeignKey('QuestObjective', on_delete=models.SET_NULL, null=True, blank=True, related_name="completion_options")
+    
+    # Метаданные
+    metadata = models.JSONField(default=dict, blank=True, help_text="Дополнительные данные")
     
     class Meta:
         ordering = ["order", "created_at"]
+        unique_together = ['dialogue', 'order']
     
     def __str__(self) -> str:
-        return f"Option: {self.text[:30]}"
+        return f"Option: {self.text[:30]} ({self.option_type})"
+    
+    def is_accessible(self, character=None):
+        """Проверяет, доступна ли опция для персонажа"""
+        if not self.is_available:
+            return False
+        
+        if not self.condition_met:
+            return False
+        
+        if self.required_skill and character:
+            skill_value = getattr(character, self.required_skill, 0)
+            if self.required_skill_value and skill_value < self.required_skill_value:
+                return False
+        
+        return True
+    
+    def execute_quest_actions(self, character=None):
+        """Выполняет действия, связанные с квестами"""
+        actions = []
+        
+        # Запуск квеста
+        if self.quest_trigger and character:
+            if self.quest_trigger.can_start(character):
+                if self.quest_trigger.start_quest(character):
+                    actions.append({
+                        'type': 'quest_started',
+                        'quest_id': str(self.quest_trigger.id),
+                        'quest_title': self.quest_trigger.title
+                    })
+        
+        # Завершение квеста
+        if self.quest_completion and character:
+            if self.quest_completion.status == 'active' and self.quest_completion.assigned_character == character:
+                self.quest_completion.complete_quest()
+                actions.append({
+                    'type': 'quest_completed',
+                    'quest_id': str(self.quest_completion.id),
+                    'quest_title': self.quest_completion.title
+                })
+        
+        # Запуск цели квеста
+        if self.quest_objective_trigger and character:
+            if not self.quest_objective_trigger.is_completed:
+                self.quest_objective_trigger.update_progress(1)
+                actions.append({
+                    'type': 'objective_started',
+                    'objective_id': str(self.quest_objective_trigger.id),
+                    'objective_title': self.quest_objective_trigger.title
+                })
+        
+        # Завершение цели квеста
+        if self.quest_objective_completion and character:
+            if not self.quest_objective_completion.is_completed:
+                self.quest_objective_completion.complete_objective()
+                actions.append({
+                    'type': 'objective_completed',
+                    'objective_id': str(self.quest_objective_completion.id),
+                    'objective_title': self.quest_objective_completion.title
+                })
+        
+        return actions
 
 
 class RollResult(BaseModel):
@@ -253,3 +398,297 @@ class RollResult(BaseModel):
     
     def __str__(self) -> str:
         return f"{self.character.name}: {self.dice_roll}+{self.skill_value}={self.total} ({'Success' if self.is_success else 'Failure'})"
+
+
+# Quest System Models
+
+class Quest(BaseModel):
+    """Модель для квестов с интеграцией диалогов"""
+    QUEST_TYPES = [
+        ('dialogue', 'Диалог'),
+        ('combat', 'Бой'),
+        ('skill_check', 'Проверка навыка'),
+        ('exploration', 'Исследование'),
+        ('puzzle', 'Головоломка'),
+        ('social', 'Социальное взаимодействие'),
+        ('fetch', 'Доставка'),
+        ('elimination', 'Устранение'),
+        ('escort', 'Эскорт'),
+        ('investigation', 'Расследование'),
+    ]
+    
+    QUEST_STATUS = [
+        ('available', 'Доступен'),
+        ('active', 'Активен'),
+        ('completed', 'Завершен'),
+        ('failed', 'Провален'),
+        ('locked', 'Заблокирован'),
+        ('paused', 'Приостановлен'),
+    ]
+    
+    QUEST_PRIORITY = [
+        ('low', 'Низкий'),
+        ('normal', 'Обычный'),
+        ('high', 'Высокий'),
+        ('critical', 'Критический'),
+    ]
+    
+    # Основная информация
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    quest_type = models.CharField(max_length=20, choices=QUEST_TYPES, default='dialogue')
+    priority = models.CharField(max_length=10, choices=QUEST_PRIORITY, default='normal')
+    difficulty_level = models.IntegerField(
+        default=1, 
+        help_text="Уровень сложности от 1 до 20",
+        validators=[MinValueValidator(1), MaxValueValidator(20)]
+    )
+    
+    # Статус и прогресс
+    status = models.CharField(max_length=20, choices=QUEST_STATUS, default='available')
+    progress = models.IntegerField(default=0, help_text="Прогресс выполнения от 0 до 100")
+    max_progress = models.IntegerField(default=100, help_text="Максимальный прогресс")
+    
+    # Связи
+    project = models.ForeignKey(GameProject, on_delete=models.CASCADE, related_name="quests", null=True, blank=True)
+    assigned_character = models.ForeignKey(Character, on_delete=models.SET_NULL, null=True, blank=True, related_name="assigned_quests")
+    quest_giver = models.ForeignKey(NPC, on_delete=models.SET_NULL, null=True, blank=True, related_name="given_quests")
+    
+    # Диалоги
+    start_dialogue = models.ForeignKey(Dialogue, on_delete=models.SET_NULL, null=True, blank=True, related_name="quest_starts")
+    completion_dialogue = models.ForeignKey(Dialogue, on_delete=models.SET_NULL, null=True, blank=True, related_name="quest_completions")
+    failure_dialogue = models.ForeignKey(Dialogue, on_delete=models.SET_NULL, null=True, blank=True, related_name="quest_failures")
+    
+    # Условия
+    prerequisites = models.ManyToManyField('self', blank=True, symmetrical=False, related_name="unlocks")
+    required_skills = models.JSONField(default=dict, blank=True, help_text="Требуемые навыки: {'skill_name': min_value}")
+    required_items = models.JSONField(default=list, blank=True, help_text="Требуемые предметы")
+    
+    # Награды
+    experience_reward = models.IntegerField(default=0)
+    skill_rewards = models.JSONField(default=dict, blank=True, help_text="Награды навыков: {'skill_name': bonus}")
+    item_rewards = models.JSONField(default=list, blank=True, help_text="Награды предметов")
+    
+    # Временные ограничения
+    time_limit = models.DurationField(null=True, blank=True, help_text="Временное ограничение")
+    deadline = models.DateTimeField(null=True, blank=True, help_text="Дедлайн квеста")
+    
+    # Метаданные
+    tags = models.JSONField(default=list, blank=True, help_text="Теги квеста")
+    metadata = models.JSONField(default=dict, blank=True, help_text="Дополнительные данные")
+    
+    # Визуальные настройки
+    color = models.CharField(max_length=7, default="#10B981", help_text="Цвет квеста")
+    icon = models.CharField(max_length=50, default="📋", help_text="Иконка квеста")
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self) -> str:
+        return f"{self.title} ({self.get_status_display()})"
+    
+    def is_available_for_character(self, character):
+        """Проверяет доступность квеста для персонажа"""
+        if self.status != 'available':
+            return False
+        
+        # Проверяем предварительные условия
+        for prereq in self.prerequisites.all():
+            if prereq.status != 'completed':
+                return False
+        
+        # Проверяем навыки
+        for skill, min_value in self.required_skills.items():
+            if hasattr(character, skill):
+                if getattr(character, skill) < min_value:
+                    return False
+        
+        return True
+    
+    def can_start(self, character):
+        """Проверяет возможность начала квеста"""
+        return self.is_available_for_character(character) and self.status == 'available'
+    
+    def start_quest(self, character):
+        """Запускает квест"""
+        if self.can_start(character):
+            self.status = 'active'
+            self.assigned_character = character
+            self.progress = 0
+            self.save()
+            return True
+        return False
+    
+    def update_progress(self, amount):
+        """Обновляет прогресс квеста"""
+        self.progress = min(self.progress + amount, self.max_progress)
+        self.save()
+        
+        if self.progress >= self.max_progress:
+            self.complete_quest()
+    
+    def complete_quest(self):
+        """Завершает квест"""
+        self.status = 'completed'
+        self.progress = self.max_progress
+        self.save()
+        
+        # Разблокируем зависимые квесты
+        for quest in self.unlocks.all():
+            if quest.status == 'locked':
+                quest.status = 'available'
+                quest.save()
+    
+    def fail_quest(self):
+        """Проваливает квест"""
+        self.status = 'failed'
+        self.save()
+    
+    def get_available_dialogues(self):
+        """Возвращает доступные диалоги для квеста"""
+        dialogues = []
+        if self.start_dialogue and self.status == 'available':
+            dialogues.append(self.start_dialogue)
+        if self.completion_dialogue and self.status == 'active' and self.progress >= self.max_progress:
+            dialogues.append(self.completion_dialogue)
+        if self.failure_dialogue and self.status == 'failed':
+            dialogues.append(self.failure_dialogue)
+        return dialogues
+
+
+class QuestObjective(BaseModel):
+    """Цели квеста"""
+    OBJECTIVE_TYPES = [
+        ('dialogue', 'Диалог'),
+        ('kill', 'Убить'),
+        ('collect', 'Собрать'),
+        ('deliver', 'Доставить'),
+        ('reach', 'Достичь'),
+        ('interact', 'Взаимодействовать'),
+        ('skill_check', 'Проверка навыка'),
+        ('time_limit', 'Временное ограничение'),
+    ]
+    
+    quest = models.ForeignKey(Quest, on_delete=models.CASCADE, related_name="objectives")
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    objective_type = models.CharField(max_length=20, choices=OBJECTIVE_TYPES, default='dialogue')
+    is_completed = models.BooleanField(default=False)
+    is_optional = models.BooleanField(default=False)
+    order = models.IntegerField(default=0)
+    
+    # Связи с диалогами
+    trigger_dialogue = models.ForeignKey(Dialogue, on_delete=models.SET_NULL, null=True, blank=True, related_name="objective_triggers")
+    completion_dialogue = models.ForeignKey(Dialogue, on_delete=models.SET_NULL, null=True, blank=True, related_name="objective_completions")
+    
+    # Условия выполнения
+    required_count = models.IntegerField(default=1, help_text="Требуемое количество")
+    current_count = models.IntegerField(default=0, help_text="Текущее количество")
+    
+    # Метаданные
+    metadata = models.JSONField(default=dict, blank=True, help_text="Дополнительные данные цели")
+    
+    class Meta:
+        ordering = ['order', 'created_at']
+    
+    def __str__(self) -> str:
+        return f"{self.quest.title}: {self.title}"
+    
+    def update_progress(self, amount=1):
+        """Обновляет прогресс цели"""
+        self.current_count = min(self.current_count + amount, self.required_count)
+        self.save()
+        
+        if self.current_count >= self.required_count and not self.is_completed:
+            self.complete_objective()
+    
+    def complete_objective(self):
+        """Завершает цель"""
+        self.is_completed = True
+        self.current_count = self.required_count
+        self.save()
+        
+        # Проверяем, завершен ли весь квест
+        self.quest.update_progress(1)
+
+
+class QuestCharacter(BaseModel):
+    """Связь между квестом и персонажами (многие ко многим)"""
+    quest = models.ForeignKey(Quest, on_delete=models.CASCADE, related_name="quest_characters")
+    character = models.ForeignKey(Character, on_delete=models.CASCADE, related_name="character_quests")
+    is_primary = models.BooleanField(default=False, help_text="Основной персонаж квеста")
+    
+    class Meta:
+        unique_together = ['quest', 'character']
+    
+    def __str__(self) -> str:
+        return f"{self.quest.title} - {self.character.name}"
+
+
+class DialogueLog(BaseModel):
+    """Лог диалогов и действий"""
+    LOG_TYPES = [
+        ('dialogue', 'Диалог'),
+        ('dice_roll', 'Бросок кубика'),
+        ('skill_check', 'Проверка навыка'),
+        ('quest_action', 'Действие квеста'),
+        ('character_action', 'Действие персонажа'),
+    ]
+    
+    quest = models.ForeignKey(Quest, on_delete=models.CASCADE, related_name="dialogue_logs", null=True, blank=True)
+    character = models.ForeignKey(Character, on_delete=models.SET_NULL, null=True, blank=True, related_name="dialogue_logs")
+    log_type = models.CharField(max_length=20, choices=LOG_TYPES)
+    author = models.CharField(max_length=200, help_text="NPC или Player")
+    content = models.TextField()
+    result = models.CharField(max_length=50, blank=True, help_text="успех/провал/нейтрально")
+    metadata = models.JSONField(default=dict, blank=True, help_text="Дополнительные данные (результат броска, модификаторы и т.д.)")
+    
+    def __str__(self) -> str:
+        return f"{self.author}: {self.content[:50]}"
+
+
+# Export System Models
+
+class ExportSession(BaseModel):
+    """Сессия экспорта проекта"""
+    EXPORT_FORMATS = [
+        ('json', 'JSON'),
+        ('yaml', 'YAML'),
+        ('xml', 'XML'),
+        ('csv', 'CSV'),
+        ('unity', 'Unity ScriptableObject'),
+        ('unreal', 'Unreal Engine Data Table'),
+        ('godot', 'Godot Resource'),
+        ('renpy', 'Ren\'Py Script'),
+        ('twine', 'Twine Story Format'),
+    ]
+    
+    EXPORT_STATUS = [
+        ('pending', 'Ожидает'),
+        ('processing', 'Обрабатывается'),
+        ('completed', 'Завершен'),
+        ('failed', 'Ошибка'),
+    ]
+    
+    project = models.ForeignKey(GameProject, on_delete=models.CASCADE, related_name="export_sessions")
+    format_type = models.CharField(max_length=20, choices=EXPORT_FORMATS, default='json')
+    status = models.CharField(max_length=20, choices=EXPORT_STATUS, default='pending')
+    file_path = models.CharField(max_length=500, blank=True)
+    file_size = models.BigIntegerField(null=True, blank=True)
+    error_message = models.TextField(blank=True)
+    export_options = models.JSONField(default=dict, blank=True)
+    
+    def __str__(self) -> str:
+        return f"Export {self.project.name} ({self.format_type}) - {self.status}"
+
+
+class ExportTemplate(BaseModel):
+    """Шаблоны экспорта для разных форматов"""
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    format_type = models.CharField(max_length=20, choices=ExportSession.EXPORT_FORMATS)
+    template_content = models.TextField(help_text="Шаблон в формате Jinja2")
+    is_default = models.BooleanField(default=False)
+    
+    def __str__(self) -> str:
+        return f"{self.name} ({self.format_type})"

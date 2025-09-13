@@ -3,25 +3,70 @@ import ReactFlow, { Background, Controls, MiniMap, addEdge, useEdgesState, useNo
 import type { Connection, Edge, Node, NodeProps } from "reactflow";
 import "reactflow/dist/style.css";
 import Button from "../notus/Button";
+import { Dialogue, Post, DialogueOption, DialogueTreeResponse, Quest } from "../../types";
+import { getDialogueTree } from "../../api/dialogue";
+import { listQuests } from "../../api/quest";
 
 type NodeData = {
   label: string;
   text?: string; // for posts
-  type?: "post" | "character"; // character covers NPC too
+  type?: "post" | "character" | "option" | "branch" | "quest"; // character covers NPC too
   isNPC?: boolean; // only for character
+  postType?: string;
+  optionType?: string;
+  questType?: string;
+  questStatus?: string;
+  color?: string;
+  icon?: string;
+  isBranchingPoint?: boolean;
+  hasOptions?: boolean;
+  postId?: string;
+  optionId?: string;
+  dialogueId?: string;
+  questId?: string;
 };
 
 // Custom Node: PostNode
 function PostNode({ data }: NodeProps<NodeData>) {
+  const getPostTypeIcon = (type: string) => {
+    switch (type) {
+      case "statement": return "💬";
+      case "question": return "❓";
+      case "action": return "⚡";
+      case "narration": return "📖";
+      default: return "💬";
+    }
+  };
+
   return (
-    <div className="w-56 max-w-[18rem] rounded-lg bg-slate-800/90 ring-1 ring-slate-700 shadow">
+    <div 
+      className="w-64 max-w-[20rem] rounded-lg bg-slate-800/90 ring-1 ring-slate-700 shadow transition-all duration-200 hover:ring-2 hover:ring-indigo-500/50"
+      style={{ borderColor: data.color ? `${data.color}40` : undefined }}
+    >
       <div className="px-3 py-2 border-b border-slate-700 flex items-center justify-between">
-        <div className="text-xs font-semibold text-slate-200 truncate">Post</div>
-        <Button className="px-2 py-1 text-xs" variant="ghost">Редактировать</Button>
+        <div className="flex items-center space-x-2">
+          <span className="text-lg">{getPostTypeIcon(data.postType || "statement")}</span>
+          <div className="text-xs font-semibold text-slate-200 truncate">
+            {data.postType || "Post"}
+          </div>
+          {data.isBranchingPoint && (
+            <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 text-purple-300 rounded-full">
+              Branch
+            </span>
+          )}
+        </div>
+        <Button className="px-2 py-1 text-xs" variant="ghost">Edit</Button>
       </div>
       <div className="p-3 text-slate-200">
         <div className="text-sm font-medium mb-1 truncate" title={data.label}>{data.label}</div>
-        {data.text ? <div className="text-xs text-slate-300/80 line-clamp-4 whitespace-pre-wrap">{data.text}</div> : null}
+        {data.text ? (
+          <div className="text-xs text-slate-300/80 line-clamp-4 whitespace-pre-wrap">{data.text}</div>
+        ) : null}
+        {data.hasOptions && (
+          <div className="mt-2 text-xs text-indigo-400">
+            Has {data.hasOptions ? "options" : "no options"}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -42,9 +87,117 @@ function CharacterNode({ data }: NodeProps<NodeData>) {
   );
 }
 
+// Custom Node: OptionNode
+function OptionNode({ data }: NodeProps<NodeData>) {
+  const getOptionTypeIcon = (type: string) => {
+    switch (type) {
+      case "response": return "💬";
+      case "choice": return "🎯";
+      case "skill_check": return "🎲";
+      case "condition": return "🔗";
+      default: return "💬";
+    }
+  };
+
+  return (
+    <div 
+      className="w-56 rounded-lg bg-slate-800/90 ring-1 ring-slate-700 shadow transition-all duration-200 hover:ring-2 hover:ring-indigo-500/50"
+      style={{ borderColor: data.color ? `${data.color}40` : undefined }}
+    >
+      <div className="px-3 py-2 border-b border-slate-700 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <span className="text-lg">{getOptionTypeIcon(data.optionType || "response")}</span>
+          <div className="text-xs font-semibold text-slate-200 truncate">
+            {data.optionType || "Option"}
+          </div>
+        </div>
+        <Button className="px-2 py-1 text-xs" variant="ghost">Edit</Button>
+      </div>
+      <div className="p-3 text-slate-200">
+        <div className="text-sm font-medium mb-1 truncate" title={data.label}>{data.label}</div>
+        {data.text ? (
+          <div className="text-xs text-slate-300/80 line-clamp-3 whitespace-pre-wrap">{data.text}</div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+// Custom Node: BranchNode
+function BranchNode({ data }: NodeProps<NodeData>) {
+  return (
+    <div className="w-48 rounded-lg bg-gradient-to-br from-purple-800/90 to-indigo-800/90 ring-1 ring-purple-600/50 shadow px-3 py-2 flex items-center gap-2">
+      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-purple-600/70">
+        <span className="text-xs text-white">🌿</span>
+      </div>
+      <div className="truncate">
+        <div className="text-sm font-semibold text-slate-200 truncate" title={data.label}>{data.label}</div>
+        <div className="text-[10px] text-purple-300">Branch</div>
+      </div>
+    </div>
+  );
+}
+
+// Custom Node: QuestNode
+function QuestNode({ data }: NodeProps<NodeData>) {
+  const getQuestStatusColor = (status: string) => {
+    switch (status) {
+      case 'available': return '#10B981';
+      case 'active': return '#3B82F6';
+      case 'completed': return '#8B5CF6';
+      case 'failed': return '#EF4444';
+      case 'locked': return '#6B7280';
+      case 'paused': return '#F59E0B';
+      default: return '#6B7280';
+    }
+  };
+
+  return (
+    <div 
+      className="w-56 rounded-lg bg-slate-800/90 ring-1 ring-slate-700 shadow transition-all duration-200 hover:ring-2 hover:ring-indigo-500/50"
+      style={{ borderColor: data.color ? `${data.color}40` : undefined }}
+    >
+      <div className="px-3 py-2 border-b border-slate-700 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <span className="text-lg">{data.icon || "📋"}</span>
+          <div className="text-xs font-semibold text-slate-200 truncate">
+            Quest
+          </div>
+          {data.questStatus && (
+            <span 
+              className="text-xs px-1.5 py-0.5 rounded-full"
+              style={{ 
+                backgroundColor: getQuestStatusColor(data.questStatus) + "20",
+                color: getQuestStatusColor(data.questStatus)
+              }}
+            >
+              {data.questStatus}
+            </span>
+          )}
+        </div>
+        <Button className="px-2 py-1 text-xs" variant="ghost">Edit</Button>
+      </div>
+      <div className="p-3 text-slate-200">
+        <div className="text-sm font-medium mb-1 truncate" title={data.label}>{data.label}</div>
+        {data.text ? (
+          <div className="text-xs text-slate-300/80 line-clamp-3 whitespace-pre-wrap">{data.text}</div>
+        ) : null}
+        {data.questType && (
+          <div className="mt-2 text-xs text-indigo-400">
+            {data.questType}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const nodeTypes = {
   post: PostNode,
   character: CharacterNode,
+  option: OptionNode,
+  branch: BranchNode,
+  quest: QuestNode,
 };
 
 const initialNodes: Node<NodeData>[] = [
@@ -55,14 +208,243 @@ const initialEdges: Edge[] = [
   // Start with empty edges
 ];
 
-export default function Canvas() {
+interface CanvasProps {
+  dialogueId?: string;
+  characterId?: string;
+}
+
+export default function Canvas({ dialogueId, characterId }: CanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedNodeIds, setSelectedNodeIds] = useState<string[]>([]);
   const [selectedEdgeIds, setSelectedEdgeIds] = useState<string[]>([]);
+  const [dialogueTree, setDialogueTree] = useState<DialogueTreeResponse | null>(null);
+  const [quests, setQuests] = useState<Quest[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Dark theme adjustments
   const proOptions = useMemo(() => ({ hideAttribution: true }), []);
+
+  // Load dialogue tree
+  const loadDialogueTree = useCallback(async () => {
+    if (!dialogueId) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await getDialogueTree(dialogueId, characterId);
+      setDialogueTree(response.data);
+      buildDialogueNodes(response.data);
+    } catch (e: any) {
+      setError(e?.response?.data?.error || e?.message || "Failed to load dialogue tree");
+    } finally {
+      setLoading(false);
+    }
+  }, [dialogueId, characterId]);
+
+  // Load quests
+  const loadQuests = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await listQuests(characterId);
+      setQuests(response.data);
+    } catch (e: any) {
+      setError(e?.response?.data?.error || e?.message || "Failed to load quests");
+    } finally {
+      setLoading(false);
+    }
+  }, [characterId]);
+
+  // Build nodes and edges from dialogue tree and quests
+  const buildDialogueNodes = useCallback((tree: DialogueTreeResponse) => {
+    const newNodes: Node<NodeData>[] = [];
+    const newEdges: Edge[] = [];
+    let nodeId = 0;
+
+    // Add dialogue title node
+    newNodes.push({
+      id: `dialogue-${tree.dialogue.id}`,
+      type: "branch",
+      position: { x: 100, y: 50 },
+      data: {
+        label: tree.dialogue.title,
+        type: "branch",
+        dialogueId: tree.dialogue.id,
+      },
+    });
+
+    // Add posts and their options
+    tree.dialogue.posts?.forEach((post, postIndex) => {
+      const postNodeId = `post-${post.id}`;
+      const postX = 100 + (postIndex % 3) * 300;
+      const postY = 200 + Math.floor(postIndex / 3) * 200;
+
+      // Add post node
+      newNodes.push({
+        id: postNodeId,
+        type: "post",
+        position: { x: postX, y: postY },
+        data: {
+          label: post.speaker || "Narrator",
+          text: post.text,
+          type: "post",
+          postType: post.post_type,
+          color: post.color,
+          icon: post.icon,
+          isBranchingPoint: post.is_branching_point,
+          hasOptions: post.has_options,
+          postId: post.id,
+        },
+      });
+
+      // Connect dialogue to first post
+      if (postIndex === 0) {
+        newEdges.push({
+          id: `edge-dialogue-${postNodeId}`,
+          source: `dialogue-${tree.dialogue.id}`,
+          target: postNodeId,
+          type: "smoothstep",
+          style: { stroke: "#6366f1", strokeWidth: 2 },
+          markerEnd: { type: "arrow", color: "#6366f1" },
+        });
+      }
+
+      // Add options for this post
+      post.available_options?.forEach((option, optionIndex) => {
+        const optionNodeId = `option-${option.id}`;
+        const optionX = postX + 200;
+        const optionY = postY + (optionIndex * 80);
+
+        newNodes.push({
+          id: optionNodeId,
+          type: "option",
+          position: { x: optionX, y: optionY },
+          data: {
+            label: option.text.substring(0, 30) + (option.text.length > 30 ? "..." : ""),
+            text: option.text,
+            type: "option",
+            optionType: option.option_type,
+            color: option.color,
+            icon: option.icon,
+            optionId: option.id,
+          },
+        });
+
+        // Connect post to option
+        newEdges.push({
+          id: `edge-${postNodeId}-${optionNodeId}`,
+          source: postNodeId,
+          target: optionNodeId,
+          type: "smoothstep",
+          style: { 
+            stroke: option.color || "#3B82F6", 
+            strokeWidth: 2,
+            strokeDasharray: option.is_accessible ? "0" : "5,5"
+          },
+          markerEnd: { type: "arrow", color: option.color || "#3B82F6" },
+        });
+
+        // If option leads to another dialogue, add branch node
+        if (option.next_dialogue) {
+          const branchNodeId = `branch-${option.next_dialogue}`;
+          const branchX = optionX + 200;
+          const branchY = optionY;
+
+          newNodes.push({
+            id: branchNodeId,
+            type: "branch",
+            position: { x: branchX, y: branchY },
+            data: {
+              label: option.next_dialogue_title || "New Branch",
+              type: "branch",
+              dialogueId: option.next_dialogue,
+            },
+          });
+
+          // Connect option to branch
+          newEdges.push({
+            id: `edge-${optionNodeId}-${branchNodeId}`,
+            source: optionNodeId,
+            target: branchNodeId,
+            type: "smoothstep",
+            style: { stroke: "#8B5CF6", strokeWidth: 2 },
+            markerEnd: { type: "arrow", color: "#8B5CF6" },
+          });
+        }
+      });
+    });
+
+    // Add quest nodes
+    quests.forEach((quest, questIndex) => {
+      const questNodeId = `quest-${quest.id}`;
+      const questX = 100 + (questIndex % 2) * 400;
+      const questY = 50 + Math.floor(questIndex / 2) * 300;
+
+      newNodes.push({
+        id: questNodeId,
+        type: "quest",
+        position: { x: questX, y: questY },
+        data: {
+          label: quest.title,
+          text: quest.description,
+          type: "quest",
+          questType: quest.quest_type,
+          questStatus: quest.status,
+          color: quest.color,
+          icon: quest.icon,
+          questId: quest.id,
+        },
+      });
+
+      // Connect quest to related dialogues
+      if (quest.start_dialogue) {
+        const dialogueNodeId = `dialogue-${quest.start_dialogue}`;
+        if (newNodes.find(n => n.id === dialogueNodeId)) {
+          newEdges.push({
+            id: `edge-${questNodeId}-${dialogueNodeId}`,
+            source: questNodeId,
+            target: dialogueNodeId,
+            type: "smoothstep",
+            style: { stroke: quest.color, strokeWidth: 2, strokeDasharray: "5,5" },
+            markerEnd: { type: "arrow", color: quest.color },
+            label: "starts",
+          });
+        }
+      }
+
+      if (quest.completion_dialogue) {
+        const dialogueNodeId = `dialogue-${quest.completion_dialogue}`;
+        if (newNodes.find(n => n.id === dialogueNodeId)) {
+          newEdges.push({
+            id: `edge-${dialogueNodeId}-${questNodeId}`,
+            source: dialogueNodeId,
+            target: questNodeId,
+            type: "smoothstep",
+            style: { stroke: quest.color, strokeWidth: 2, strokeDasharray: "5,5" },
+            markerEnd: { type: "arrow", color: quest.color },
+            label: "completes",
+          });
+        }
+      }
+    });
+
+    setNodes(newNodes);
+    setEdges(newEdges);
+  }, [setNodes, setEdges, quests]);
+
+  // Load dialogue tree when dialogueId changes
+  useEffect(() => {
+    loadDialogueTree();
+  }, [loadDialogueTree]);
+
+  // Load quests on mount
+  useEffect(() => {
+    loadQuests();
+  }, [loadQuests]);
 
   const onConnect = useCallback((params: Connection) => {
     setEdges((eds) =>
@@ -115,8 +497,17 @@ export default function Canvas() {
               <span className="text-lg">🎯</span>
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">Dialogue Canvas</h2>
-              <p className="text-xs text-gray-400">Visual node editor for dialogue flow</p>
+              <h2 className="text-lg font-semibold text-white">
+                {dialogueTree ? dialogueTree.dialogue.title : "Dialogue Canvas"}
+              </h2>
+              <p className="text-xs text-gray-400">
+                {dialogueTree 
+                  ? `Visual flow: ${dialogueTree.dialogue.posts_count} posts, ${dialogueTree.dialogue.options_count} options, ${dialogueTree.dialogue.branching_points_count} branches`
+                  : quests.length > 0
+                  ? `Quests: ${quests.length} total, ${quests.filter(q => q.status === 'active').length} active`
+                  : "Visual node editor for dialogue flow"
+                }
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -145,9 +536,23 @@ export default function Canvas() {
         </div>
       </div>
       
+      {/* Error Display */}
+      {error && (
+        <div className="mx-4 mb-4 bg-red-500/20 border border-red-500/50 rounded-lg p-4 text-red-300">
+          {error}
+        </div>
+      )}
+
       {/* Canvas Area */}
       <div className="flex-1 relative bg-gradient-to-br from-gray-900/50 to-gray-800/50">
-        {nodes.length === 0 ? (
+        {loading ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center text-gray-400">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+              <p>Loading dialogue tree...</p>
+            </div>
+          </div>
+        ) : nodes.length === 0 ? (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center text-gray-400">
               <div className="w-16 h-16 mx-auto mb-4 bg-white/5 rounded-xl flex items-center justify-center">

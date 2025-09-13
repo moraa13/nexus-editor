@@ -5,8 +5,16 @@ from .views import (
     GameProjectViewSet, DialogueNodeViewSet, DialogueLinkViewSet, CharacterStatViewSet,
     CharacterViewSet, NPCViewSet, DialogueViewSet, PostViewSet, 
     SkillCheckViewSet, DialogueOptionViewSet, RollResultViewSet,
+    QuestViewSet, QuestObjectiveViewSet, QuestCharacterViewSet, DialogueLogViewSet,
+    ExportSessionViewSet, ExportTemplateViewSet,
     generate_replicas, roll_skill_check, get_character_skills,
+    generate_dialogue_result, generate_player_responses, log_dialogue_event,
+    export_project, download_export, get_export_templates,
+    get_dialogue_tree, create_dialogue_branch, create_dialogue_option,
+    start_quest, complete_quest, fail_quest, update_quest_progress,
+    get_character_quests, execute_dialogue_option,
 )
+from .auth_views import login, register, logout, user_profile
 
 router = DefaultRouter()
 router.register("projects", ProjectViewSet, basename="project")
@@ -22,11 +30,45 @@ router.register("posts", PostViewSet, basename="post")
 router.register("skill-checks", SkillCheckViewSet, basename="skillcheck")
 router.register("dialogue-options", DialogueOptionViewSet, basename="dialogueoption")
 router.register("roll-results", RollResultViewSet, basename="rollresult")
+router.register("quests", QuestViewSet, basename="quest")
+router.register("quest-objectives", QuestObjectiveViewSet, basename="quest-objective")
+router.register("quest-characters", QuestCharacterViewSet, basename="questcharacter")
+router.register("dialogue-logs", DialogueLogViewSet, basename="dialoguelog")
+router.register("export-sessions", ExportSessionViewSet, basename="exportsession")
+router.register("export-templates", ExportTemplateViewSet, basename="exporttemplate")
 
 urlpatterns = [
+    # Authentication endpoints
+    path("auth/login/", login),
+    path("auth/register/", register),
+    path("auth/logout/", logout),
+    path("auth/profile/", user_profile),
+    
+    # Game endpoints
     path("generate_replicas/", generate_replicas),
     path("roll_skill_check/", roll_skill_check),
     path("characters/<uuid:character_id>/skills/", get_character_skills),
+    path("generate_dialogue_result/", generate_dialogue_result),
+    path("generate_player_responses/", generate_player_responses),
+    path("log_dialogue_event/", log_dialogue_event),
+    
+    # Dialogue branching endpoints
+    path("dialogues/<uuid:dialogue_id>/tree/", get_dialogue_tree),
+    path("dialogues/branch/", create_dialogue_branch),
+    path("dialogues/option/", create_dialogue_option),
+    path("dialogues/option/execute/", execute_dialogue_option),
+    
+    # Quest management endpoints
+    path("quests/start/", start_quest),
+    path("quests/complete/", complete_quest),
+    path("quests/fail/", fail_quest),
+    path("quests/progress/", update_quest_progress),
+    path("characters/<uuid:character_id>/quests/", get_character_quests),
+    
+    # Export endpoints
+    path("export/project/", export_project),
+    path("export/download/<uuid:export_session_id>/", download_export),
+    path("export/templates/", get_export_templates),
 ]
 urlpatterns += router.urls
 

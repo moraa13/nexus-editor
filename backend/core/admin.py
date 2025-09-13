@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import (
     Project, UserProfile, GameProject, DialogueNode, DialogueLink, CharacterStat,
-    Character, NPC, Dialogue, Post, SkillCheck, DialogueOption, RollResult
+    Character, NPC, Dialogue, Post, SkillCheck, DialogueOption, RollResult,
+    Quest, QuestCharacter, DialogueLog
 )
 
 @admin.register(Project)
@@ -98,3 +99,27 @@ class CharacterStatAdmin(admin.ModelAdmin):
     list_display = ['name', 'value', 'project', 'created_at']
     list_filter = ['created_at', 'project']
     search_fields = ['name', 'description']
+
+
+# Quest System Admin
+
+@admin.register(Quest)
+class QuestAdmin(admin.ModelAdmin):
+    list_display = ['title', 'quest_type', 'difficulty_level', 'assigned_character', 'status', 'created_at']
+    list_filter = ['quest_type', 'status', 'difficulty_level', 'created_at']
+    search_fields = ['title', 'description']
+
+
+@admin.register(QuestCharacter)
+class QuestCharacterAdmin(admin.ModelAdmin):
+    list_display = ['quest', 'character', 'is_primary', 'created_at']
+    list_filter = ['is_primary', 'created_at']
+    search_fields = ['quest__title', 'character__name']
+
+
+@admin.register(DialogueLog)
+class DialogueLogAdmin(admin.ModelAdmin):
+    list_display = ['author', 'log_type', 'quest', 'character', 'result', 'created_at']
+    list_filter = ['log_type', 'result', 'created_at']
+    search_fields = ['author', 'content', 'quest__title', 'character__name']
+    readonly_fields = ['created_at', 'updated_at']
