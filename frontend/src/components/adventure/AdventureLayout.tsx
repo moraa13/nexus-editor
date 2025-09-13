@@ -488,7 +488,6 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
               </div>
             )}
           </div>
-          )}
         
         {/* Toast Container */}
         <ToastContainer />
