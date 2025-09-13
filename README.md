@@ -45,7 +45,7 @@ pip install -r requirements.txt
 cd frontend
 npm run dev
 
-# Откройте http://localhost:5173
+# Откройте http://localhost:5181
 ```
 
 ## 📁 Структура проекта

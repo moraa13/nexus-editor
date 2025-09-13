@@ -411,3 +411,161 @@ h3 {
   word-break: break-word;
   overflow-wrap: break-word;
 }
+
+/* Text animations for right panel */
+@keyframes typewriter {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes fade-in-delayed {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  50% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes text-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    filter: blur(10px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(15px) scale(0.98);
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Enhanced text styling classes */
+.enhanced-text {
+  animation: text-reveal 0.8s ease-out forwards;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+}
+
+.enhanced-text-delayed {
+  animation: fade-in-delayed 1.2s ease-out forwards;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+}
+
+.enhanced-description {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border-left: 3px solid rgba(59, 130, 246, 0.6);
+  padding-left: 1rem;
+  margin-left: -1rem;
+  border-radius: 0 8px 8px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.enhanced-description::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: shimmer 2s infinite;
+}
+
+.enhanced-history {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+  border-left: 3px solid rgba(139, 92, 246, 0.6);
+  padding-left: 1rem;
+  margin-left: -1rem;
+  border-radius: 0 8px 8px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.enhanced-history::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: shimmer 2s infinite;
+}
+
+/* Tab transition animations */
+.tab-content {
+  transition: all 0.3s ease-in-out;
+  transform: translateZ(0);
+}
+
+.tab-content-enter {
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
+}
+
+.tab-content-enter-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+.tab-content-exit {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.tab-content-exit-active {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+  transition: opacity 200ms ease-in, transform 200ms ease-in;
+}
+
+/* Smooth scrollbar styling */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.5);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.7);
+}

@@ -142,7 +142,7 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                               <span className="text-lg">👤</span>
                               <span className="text-sm font-medium text-white">{character.name}</span>
                             </div>
-                            <button
+          <button
                               onClick={() => {
                                 // Clone character
                                 const clonedCharacter = {
@@ -157,8 +157,8 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                               title="Клонировать персонажа"
                             >
                               📋
-                            </button>
-                          </div>
+          </button>
+        </div>
                           <div className="text-xs text-gray-400">
                             Уровень {character.level} • {Object.values(character.stats).reduce((sum, stat) => sum + stat.value, 0)} очков
                           </div>
@@ -167,7 +167,7 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                   </div>
                 </>
               )}
-            </div>
+      </div>
           )}
           
           {activeSection === 'characters' && characters.length === 0 && (
@@ -178,8 +178,7 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex">
-          <div className="flex-1 p-8">
+        <div className="flex-1 p-8">
             <div className="max-w-4xl mx-auto">
               <h1 className="text-4xl font-bold text-white mb-2">Добро пожаловать в Nexus!</h1>
               
@@ -192,47 +191,62 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
               <div className="grid grid-cols-2 gap-6 max-w-3xl">
                 <button
                   onClick={() => handleActionClick('create-character')}
-                  className="bg-gray-700 hover:bg-gray-600 text-white p-6 rounded-lg transition-colors text-left border border-gray-600"
+                  className="group bg-gradient-to-br from-blue-600/20 to-purple-600/20 hover:from-blue-600/30 hover:to-purple-600/30 text-white p-6 rounded-xl transition-all duration-300 text-left border border-blue-500/30 hover:border-blue-400/50 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 hover:-translate-y-1 relative overflow-hidden"
                 >
-                  <div className="text-2xl mb-3">👤</div>
-                  <h3 className="text-xl font-semibold mb-2">Создать персонажа</h3>
-                  <p className="text-gray-300 text-sm">Создайте уникальных персонажей для вашей истории</p>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="relative z-10">
+                    <div className="text-2xl mb-3 group-hover:scale-110 transition-transform duration-300">👤</div>
+                    <h3 className="text-xl font-semibold mb-2 group-hover:text-blue-300 transition-colors duration-300">Создать персонажа</h3>
+                    <p className="text-gray-300 text-sm group-hover:text-gray-200 transition-colors duration-300">Создайте уникальных персонажей для вашей истории</p>
+                  </div>
                 </button>
 
                 <button
                   onClick={() => handleActionClick('create-event')}
-                  className="bg-gray-700 hover:bg-gray-600 text-white p-6 rounded-lg transition-colors text-left border border-gray-600"
+                  className="group bg-gradient-to-br from-green-600/20 to-teal-600/20 hover:from-green-600/30 hover:to-teal-600/30 text-white p-6 rounded-xl transition-all duration-300 text-left border border-green-500/30 hover:border-green-400/50 shadow-lg hover:shadow-xl hover:shadow-green-500/20 hover:-translate-y-1 relative overflow-hidden"
                 >
-                  <div className="text-2xl mb-3">🎭</div>
-                  <h3 className="text-xl font-semibold mb-2">Создать событие</h3>
-                  <p className="text-gray-300 text-sm">Добавьте захватывающие события в вашу историю</p>
+                  <div className="absolute inset-0 bg-gradient-to-r from-green-600/10 to-teal-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="relative z-10">
+                    <div className="text-2xl mb-3 group-hover:scale-110 transition-transform duration-300">🎭</div>
+                    <h3 className="text-xl font-semibold mb-2 group-hover:text-green-300 transition-colors duration-300">Создать событие</h3>
+                    <p className="text-gray-300 text-sm group-hover:text-gray-200 transition-colors duration-300">Добавьте захватывающие события в вашу историю</p>
+                  </div>
                 </button>
 
                 <button
                   onClick={() => handleActionClick('event-branch')}
-                  className="bg-gray-700 hover:bg-gray-600 text-white p-6 rounded-lg transition-colors text-left border border-gray-600"
+                  className="group bg-gradient-to-br from-yellow-600/20 to-orange-600/20 hover:from-yellow-600/30 hover:to-orange-600/30 text-white p-6 rounded-xl transition-all duration-300 text-left border border-yellow-500/30 hover:border-yellow-400/50 shadow-lg hover:shadow-xl hover:shadow-yellow-500/20 hover:-translate-y-1 relative overflow-hidden"
                 >
-                  <div className="text-2xl mb-3">🌳</div>
-                  <h3 className="text-xl font-semibold mb-2">Ветка событий</h3>
-                  <p className="text-gray-300 text-sm">Создайте разветвления и альтернативные пути</p>
+                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/10 to-orange-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="relative z-10">
+                    <div className="text-2xl mb-3 group-hover:scale-110 transition-transform duration-300">🌳</div>
+                    <h3 className="text-xl font-semibold mb-2 group-hover:text-yellow-300 transition-colors duration-300">Ветка событий</h3>
+                    <p className="text-gray-300 text-sm group-hover:text-gray-200 transition-colors duration-300">Создайте разветвления и альтернативные пути</p>
+                  </div>
                 </button>
 
                 <button
                   onClick={() => handleActionClick('open-project')}
-                  className="bg-gray-700 hover:bg-gray-600 text-white p-6 rounded-lg transition-colors text-left border border-gray-600"
+                  className="group bg-gradient-to-br from-indigo-600/20 to-blue-600/20 hover:from-indigo-600/30 hover:to-blue-600/30 text-white p-6 rounded-xl transition-all duration-300 text-left border border-indigo-500/30 hover:border-indigo-400/50 shadow-lg hover:shadow-xl hover:shadow-indigo-500/20 hover:-translate-y-1 relative overflow-hidden"
                 >
-                  <div className="text-2xl mb-3">📁</div>
-                  <h3 className="text-xl font-semibold mb-2">Открыть проект</h3>
-                  <p className="text-gray-300 text-sm">Откройте существующий проект для работы</p>
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="relative z-10">
+                    <div className="text-2xl mb-3 group-hover:scale-110 transition-transform duration-300">📁</div>
+                    <h3 className="text-xl font-semibold mb-2 group-hover:text-indigo-300 transition-colors duration-300">Открыть проект</h3>
+                    <p className="text-gray-300 text-sm group-hover:text-gray-200 transition-colors duration-300">Откройте существующий проект для работы</p>
+                  </div>
                 </button>
 
                 <button
                   onClick={() => handleActionClick('game-setting')}
-                  className="bg-purple-700 hover:bg-purple-600 text-white p-6 rounded-lg transition-colors text-left border border-purple-600"
+                  className="group bg-gradient-to-br from-purple-600/20 to-pink-600/20 hover:from-purple-600/30 hover:to-pink-600/30 text-white p-6 rounded-xl transition-all duration-300 text-left border border-purple-500/30 hover:border-purple-400/50 shadow-lg hover:shadow-xl hover:shadow-purple-500/20 hover:-translate-y-1 relative overflow-hidden"
                 >
-                  <div className="text-2xl mb-3">🎭</div>
-                  <h3 className="text-xl font-semibold mb-2">Сеттинг</h3>
-                  <p className="text-gray-300 text-sm">Настроить тональность и стиль игры</p>
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="relative z-10">
+                    <div className="text-2xl mb-3 group-hover:scale-110 transition-transform duration-300">🎭</div>
+                    <h3 className="text-xl font-semibold mb-2 group-hover:text-purple-300 transition-colors duration-300">Сеттинг</h3>
+                    <p className="text-gray-300 text-sm group-hover:text-gray-200 transition-colors duration-300">Настроить тональность и стиль игры</p>
+                  </div>
                 </button>
               </div>
 
@@ -291,13 +305,13 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                       </div>
                     )}
                   </div>
-                </div>
-              )}
+              </div>
+            )}
             </div>
-          </div>
+        </div>
 
-          {/* Right Context Panel - Fixed */}
-          <div className="w-80 bg-gradient-to-b from-gray-800 to-gray-900 border-l border-gray-700 p-6 flex flex-col">
+        {/* Right Context Panel - Fixed Position */}
+        <div className="fixed top-20 right-0 w-80 h-[calc(100vh-5rem)] bg-gradient-to-b from-gray-800 to-gray-900 border-l border-gray-700 p-6 flex flex-col z-30 shadow-2xl backdrop-blur-sm">
             <div className="flex items-center gap-2 mb-6">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white text-lg">🧠</span>
@@ -307,7 +321,7 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
             
             {/* Tab Navigation */}
             <div className="flex gap-1 mb-6 bg-gray-700 p-1 rounded-lg">
-              <button 
+              <button
                 onClick={() => setActiveTab('description')}
                 className={`flex-1 px-3 py-2 text-sm rounded-md transition-all ${
                   activeTab === 'description' 
@@ -317,7 +331,7 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
               >
                 Описание
               </button>
-              <button 
+              <button
                 onClick={() => setActiveTab('history')}
                 className={`flex-1 px-3 py-2 text-sm rounded-md transition-all ${
                   activeTab === 'history' 
@@ -327,7 +341,7 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
               >
                 История
               </button>
-              <button 
+                <button
                 onClick={() => setActiveTab('skills')}
                 className={`flex-1 px-3 py-2 text-sm rounded-md transition-all ${
                   activeTab === 'skills' 
@@ -336,68 +350,71 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                 }`}
               >
                 Навыки
-              </button>
+                </button>
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto custom-scrollbar" style={{ maxHeight: 'calc(100vh - 200px)' }}>
               {selectedCharacterStat ? (
-                <div className="space-y-4">
+                <div className="space-y-4 min-h-full">
                   {/* Character Stat Header */}
-                  <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 p-4 rounded-lg border border-blue-500/30">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-2xl">💡</span>
-                      <h4 className="text-lg font-bold text-white">{selectedCharacterStat.stat}</h4>
+                  <div className="bg-gradient-to-r from-blue-900/60 to-purple-900/60 p-5 rounded-xl border border-blue-500/40 shadow-xl backdrop-blur-sm enhanced-text">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-3xl drop-shadow-lg">💡</span>
+                      <h4 className="text-xl font-bold text-white drop-shadow-md">{selectedCharacterStat.stat}</h4>
                     </div>
                     <div className="flex gap-2">
-                      <span className="px-2 py-1 bg-blue-600/30 text-blue-300 text-xs rounded">Интеллект</span>
-                      <span className="px-2 py-1 bg-gray-600/30 text-gray-300 text-xs rounded">Уровень 1</span>
-                    </div>
-                  </div>
-                  
+                      <span className="px-3 py-1 bg-blue-600/40 text-blue-200 text-xs rounded-full border border-blue-500/40 shadow-md">Интеллект</span>
+                      <span className="px-3 py-1 bg-gray-600/40 text-gray-200 text-xs rounded-full border border-gray-500/40 shadow-md">Уровень 1</span>
+          </div>
+        </div>
+
                   {/* Tab Content */}
-                  {activeTab === 'description' && (
-                    <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600/50">
-                      <h5 className="text-sm font-semibold text-blue-300 mb-3 flex items-center gap-2">
-                        <span>📖</span>
-                        Описание
-                      </h5>
-                      <div className="w-full">
-                        <p className="text-gray-200 text-sm character-description w-full">{selectedCharacterStat.description}</p>
+                  <div className="relative">
+                    {activeTab === 'description' && (
+                      <div className="bg-gray-700/30 p-6 rounded-xl border border-blue-500/30 shadow-lg backdrop-blur-sm transition-all duration-300 ease-in-out">
+                        <h5 className="text-sm font-semibold text-blue-300 mb-4 flex items-center gap-2 enhanced-text">
+                          <span className="text-lg">📖</span>
+                          Описание
+                        </h5>
+                        <div className="w-full enhanced-description">
+                          <p className="text-gray-100 text-sm enhanced-text-delayed w-full leading-relaxed">{selectedCharacterStat.description}</p>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                   
-                  {activeTab === 'history' && (
-                    <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600/50">
-                      <h5 className="text-sm font-semibold text-purple-300 mb-3 flex items-center gap-2">
-                        <span>📜</span>
-                        История персонажа
-                      </h5>
-                      <div className="w-full">
-                        <p className="text-gray-200 text-sm italic character-description w-full">{selectedCharacterStat.history}</p>
+                    {activeTab === 'history' && (
+                      <div className="bg-gray-700/30 p-6 rounded-xl border border-purple-500/30 shadow-lg backdrop-blur-sm transition-all duration-300 ease-in-out">
+                        <h5 className="text-sm font-semibold text-purple-300 mb-4 flex items-center gap-2 enhanced-text">
+                          <span className="text-lg">📜</span>
+                          История персонажа
+                        </h5>
+                        <div className="w-full enhanced-history">
+                          <p className="text-gray-100 text-sm italic enhanced-text-delayed w-full leading-relaxed">{selectedCharacterStat.history}</p>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                   
-                  {activeTab === 'skills' && (
-                    <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600/50">
-                      <h5 className="text-sm font-semibold text-green-300 mb-3 flex items-center gap-2">
-                        <span>⚡</span>
-                        Навыки
-                      </h5>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedCharacterStat.skills.map((skill, index) => (
-                          <span 
-                            key={index}
-                            className="text-xs bg-gradient-to-r from-green-600/30 to-blue-600/30 text-green-200 px-3 py-1 rounded-full border border-green-500/30"
-                          >
-                            {skill}
-                          </span>
-                        ))}
+                    {activeTab === 'skills' && (
+                      <div className="bg-gray-700/30 p-6 rounded-xl border border-green-500/30 shadow-lg backdrop-blur-sm transition-all duration-300 ease-in-out">
+                        <h5 className="text-sm font-semibold text-green-300 mb-4 flex items-center gap-2 enhanced-text">
+                          <span className="text-lg">⚡</span>
+                          Навыки
+                        </h5>
+                        <div className="flex flex-wrap gap-3">
+                          {selectedCharacterStat.skills.map((skill, index) => (
+                            <span 
+                              key={index}
+                              className="text-xs bg-gradient-to-r from-green-600/40 to-blue-600/40 text-green-100 px-4 py-2 rounded-full border border-green-500/40 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 enhanced-text-delayed"
+                              style={{ animationDelay: `${index * 0.1}s` }}
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -421,7 +438,7 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                       <p>• <span className="text-purple-300">История</span> — личная история персонажа</p>
                       <p>• <span className="text-green-300">Навыки</span> — связанные умения и способности</p>
                     </div>
-                  </div>
+                    </div>
 
                   {/* Current Game Setting */}
                   <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 p-4 rounded-lg border border-purple-500/30">
@@ -436,14 +453,13 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
-      </div>
-      
-      {/* Toast Container */}
-      <ToastContainer />
+        </div>
+        
+        {/* Toast Container */}
+        <ToastContainer />
     </div>
   );
 }

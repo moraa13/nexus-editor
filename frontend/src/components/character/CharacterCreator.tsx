@@ -140,7 +140,7 @@ export default function CharacterCreator({ onSave, onCancel, compact = false, on
           <button
             onClick={() => decrementStat(statKey)}
             disabled={currentValue <= CHARACTER_CREATION.MIN_STAT_VALUE}
-            className="w-8 h-8 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-500 text-white rounded-full flex items-center justify-center transition-colors"
+            className="w-8 h-8 bg-gradient-to-br from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 disabled:from-gray-800 disabled:to-gray-700 disabled:text-gray-500 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-md hover:shadow-lg"
           >
             −
           </button>
@@ -152,9 +152,10 @@ export default function CharacterCreator({ onSave, onCancel, compact = false, on
               max={CHARACTER_CREATION.MAX_STAT_VALUE}
               value={currentValue}
               onChange={(e) => updateStat(statKey, parseInt(e.target.value))}
-              className="w-full h-2 rounded-lg appearance-none cursor-pointer slider"
+              className="w-full h-3 rounded-lg appearance-none cursor-pointer slider transition-all duration-300 hover:scale-105"
               style={{
-                background: `linear-gradient(to right, ${color} 0%, ${color} ${(currentValue / CHARACTER_CREATION.MAX_STAT_VALUE) * 100}%, #374151 ${(currentValue / CHARACTER_CREATION.MAX_STAT_VALUE) * 100}%, #374151 100%)`
+                background: `linear-gradient(to right, ${color} 0%, ${color} ${(currentValue / CHARACTER_CREATION.MAX_STAT_VALUE) * 100}%, #374151 ${(currentValue / CHARACTER_CREATION.MAX_STAT_VALUE) * 100}%, #374151 100%)`,
+                boxShadow: `0 0 10px ${color}40, inset 0 2px 4px rgba(0,0,0,0.2)`
               }}
             />
           </div>
@@ -198,7 +199,7 @@ export default function CharacterCreator({ onSave, onCancel, compact = false, on
               decrementStat(statKey);
             }}
             disabled={currentValue <= CHARACTER_CREATION.MIN_STAT_VALUE}
-            className="w-5 h-5 bg-gray-600 hover:bg-gray-500 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-full flex items-center justify-center transition-all duration-200 text-xs hover:scale-110 active:scale-95"
+            className="w-5 h-5 bg-gradient-to-br from-gray-600 to-gray-500 hover:from-gray-500 hover:to-gray-400 disabled:from-gray-700 disabled:to-gray-600 disabled:text-gray-500 text-white rounded-full flex items-center justify-center transition-all duration-200 text-xs hover:scale-110 active:scale-95 shadow-md hover:shadow-lg"
           >
             −
           </button>
@@ -210,9 +211,10 @@ export default function CharacterCreator({ onSave, onCancel, compact = false, on
               max={CHARACTER_CREATION.MAX_STAT_VALUE}
               value={currentValue}
               onChange={(e) => updateStat(statKey, parseInt(e.target.value))}
-              className="w-full h-1 rounded-lg appearance-none cursor-pointer slider"
+              className="w-full h-2 rounded-lg appearance-none cursor-pointer slider transition-all duration-300 hover:scale-105"
               style={{
-                background: `linear-gradient(to right, ${color} 0%, ${color} ${(currentValue / CHARACTER_CREATION.MAX_STAT_VALUE) * 100}%, #4B5563 ${(currentValue / CHARACTER_CREATION.MAX_STAT_VALUE) * 100}%, #4B5563 100%)`
+                background: `linear-gradient(to right, ${color} 0%, ${color} ${(currentValue / CHARACTER_CREATION.MAX_STAT_VALUE) * 100}%, #4B5563 ${(currentValue / CHARACTER_CREATION.MAX_STAT_VALUE) * 100}%, #4B5563 100%)`,
+                boxShadow: `0 0 8px ${color}30, inset 0 1px 2px rgba(0,0,0,0.2)`
               }}
             />
           </div>

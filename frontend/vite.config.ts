@@ -68,11 +68,11 @@ export default defineConfig({
   // Development server optimization
   server: {
     host: '0.0.0.0',
-    port: 5173,
+    port: 5181,
     hmr: {
       overlay: false,
-      port: 5173,
-      clientPort: 5173
+      port: 5181,
+      clientPort: 5181
     }
   },
   
