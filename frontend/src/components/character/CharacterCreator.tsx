@@ -36,9 +36,9 @@ export default function CharacterCreator({ onSave, onCancel, compact = false, on
     return initialStats;
   });
 
-  // Calculate total points used
+  // Calculate total points used (subtract base value of 1 for each stat)
   const totalPointsUsed = useMemo(() => {
-    return Object.values(stats).reduce((sum, value) => sum + value, 0);
+    return Object.values(stats).reduce((sum, value) => sum + (value - 1), 0);
   }, [stats]);
 
   // Calculate remaining points
@@ -53,8 +53,8 @@ export default function CharacterCreator({ onSave, onCancel, compact = false, on
     const newStats = { ...stats };
     newStats[statKey] = value;
     
-    // Check if we have enough points
-    const newTotal = Object.values(newStats).reduce((sum, val) => sum + val, 0);
+    // Check if we have enough points (subtract base value of 1 for each stat)
+    const newTotal = Object.values(newStats).reduce((sum, val) => sum + (val - 1), 0);
     if (newTotal <= CHARACTER_CREATION.TOTAL_POINTS) {
       setStats(newStats);
     }
