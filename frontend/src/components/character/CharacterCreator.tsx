@@ -12,7 +12,7 @@ interface CharacterCreatorProps {
   onSave?: (character: DiscoElysiumCharacter) => void;
   onCancel?: () => void;
   compact?: boolean;
-  onStatSelect?: (stat: string, description: string, history: string, skills: string[]) => void;
+  onStatSelect?: (stat: string, description: string, history: string, skills: string[], icon?: string, category?: string, categoryName?: string) => void;
 }
 
 export default function CharacterCreator({ onSave, onCancel, compact = false, onStatSelect }: CharacterCreatorProps) {
@@ -183,7 +183,7 @@ export default function CharacterCreator({ onSave, onCancel, compact = false, on
         onClick={(e) => {
           e.stopPropagation();
           setSelectedStat(statKey);
-          onStatSelect?.(stat.name, stat.description, stat.history, stat.skills);
+          onStatSelect?.(stat.name, stat.description, stat.history, stat.skills, stat.icon, stat.category, STAT_CATEGORIES[stat.category].name);
         }}
         title={`${stat.icon} ${stat.name} — ${stat.description}`}
       >

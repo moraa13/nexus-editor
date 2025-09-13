@@ -12,7 +12,15 @@ interface AdventureLayoutProps {
 export default function AdventureLayout({ children }: AdventureLayoutProps) {
   const [activeSection, setActiveSection] = useState<'characters' | 'events' | 'branches' | 'projects'>('characters');
   const [selectedAction, setSelectedAction] = useState<'create-character' | 'create-event' | 'event-branch' | 'open-project' | 'game-setting' | null>(null);
-  const [selectedCharacterStat, setSelectedCharacterStat] = useState<{stat: string, description: string, history: string, skills: string[]} | null>(null);
+  const [selectedCharacterStat, setSelectedCharacterStat] = useState<{
+    stat: string, 
+    description: string, 
+    history: string, 
+    skills: string[],
+    icon?: string,
+    category?: string,
+    categoryName?: string
+  } | null>(null);
   const [characters, setCharacters] = useState<DiscoElysiumCharacter[]>([]);
   const [characterFilter, setCharacterFilter] = useState('');
   const [activeTab, setActiveTab] = useState<'description' | 'history' | 'skills'>('description');
@@ -264,8 +272,16 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                         }}
                         onCancel={handleClosePanel}
                         compact={true}
-                        onStatSelect={(stat, description, history, skills) => {
-                          setSelectedCharacterStat({stat, description, history, skills});
+                        onStatSelect={(stat, description, history, skills, icon, category, categoryName) => {
+                          setSelectedCharacterStat({ 
+                            stat, 
+                            description, 
+                            history, 
+                            skills, 
+                            icon, 
+                            category, 
+                            categoryName 
+                          });
                         }}
                       />
                     ) : selectedAction === 'game-setting' ? (
@@ -311,12 +327,22 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
         </div>
 
         {/* Right Context Panel - Fixed Position */}
-        <div className="fixed top-20 right-0 w-80 h-[calc(100vh-5rem)] bg-gradient-to-b from-gray-800 to-gray-900 border-l border-gray-700 p-6 flex flex-col z-30 shadow-2xl backdrop-blur-sm">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white text-lg">🧠</span>
+        {selectedCharacterStat && (
+          <div className="fixed top-20 right-0 w-80 h-[calc(100vh-5rem)] bg-gradient-to-b from-gray-800 to-gray-900 border-l border-gray-700 p-6 flex flex-col z-30 shadow-2xl backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-lg">🧠</span>
+                </div>
+                <h3 className="text-xl font-bold text-white">Справочник</h3>
               </div>
-              <h3 className="text-xl font-bold text-white">Справочник</h3>
+              <button
+                onClick={() => setSelectedCharacterStat(null)}
+                className="w-6 h-6 bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white rounded-full flex items-center justify-center transition-colors text-sm"
+                title="Закрыть справочник"
+              >
+                ×
+              </button>
             </div>
             
             {/* Tab Navigation */}
@@ -360,11 +386,18 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                   {/* Character Stat Header */}
                   <div className="bg-gradient-to-r from-blue-900/60 to-purple-900/60 p-5 rounded-xl border border-blue-500/40 shadow-xl backdrop-blur-sm enhanced-text">
                     <div className="flex items-center gap-3 mb-3">
-                      <span className="text-3xl drop-shadow-lg">💡</span>
+                      <span className="text-3xl drop-shadow-lg">{selectedCharacterStat.icon || '💡'}</span>
                       <h4 className="text-xl font-bold text-white drop-shadow-md">{selectedCharacterStat.stat}</h4>
                     </div>
                     <div className="flex gap-2">
-                      <span className="px-3 py-1 bg-blue-600/40 text-blue-200 text-xs rounded-full border border-blue-500/40 shadow-md">Интеллект</span>
+                      <span className={`px-3 py-1 text-xs rounded-full border shadow-md ${
+                        selectedCharacterStat.category === 'intellect' ? 'bg-blue-600/40 text-blue-200 border-blue-500/40' :
+                        selectedCharacterStat.category === 'psyche' ? 'bg-purple-600/40 text-purple-200 border-purple-500/40' :
+                        selectedCharacterStat.category === 'physique' ? 'bg-red-600/40 text-red-200 border-red-500/40' :
+                        'bg-green-600/40 text-green-200 border-green-500/40'
+                      }`}>
+                        {selectedCharacterStat.categoryName || 'Характеристика'}
+                      </span>
                       <span className="px-3 py-1 bg-gray-600/40 text-gray-200 text-xs rounded-full border border-gray-500/40 shadow-md">Уровень 1</span>
           </div>
         </div>
@@ -450,12 +483,12 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                       <p><span className="text-white">Жанр:</span> {gameSetting.genre}</p>
                       <p><span className="text-white">Тон:</span> {gameSetting.emotionalTone}</p>
                       <p><span className="text-white">Стиль:</span> {gameSetting.narrativeStyle}</p>
-                    </div>
                   </div>
                 </div>
+              </div>
             )}
           </div>
-        </div>
+        )}
         </div>
         
         {/* Toast Container */}
