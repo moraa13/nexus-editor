@@ -481,14 +481,17 @@ export default function AdventureLayout({ children }: AdventureLayoutProps) {
                       <p><span className="text-white">Жанр:</span> {gameSetting.genre}</p>
                       <p><span className="text-white">Тон:</span> {gameSetting.emotionalTone}</p>
                       <p><span className="text-white">Стиль:</span> {gameSetting.narrativeStyle}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )}
+        </div>
         
         {/* Toast Container */}
         <ToastContainer />
+      </div>
     </div>
   );
 }
