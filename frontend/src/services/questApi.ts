@@ -37,20 +37,25 @@ class QuestApiService {
 
   constructor() {
     // Use Vite environment variable
-    this.baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+    this.baseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
   }
 
   // Generate full quest with multiple steps
   async generateFullQuest(context: QuestContext, stepCount: number = 2): Promise<QuestStep[]> {
     try {
-      const response = await axios.post(`${this.baseUrl}/quests/generate/`, {
+      const url = `${this.baseUrl}/quests/generate/`;
+      const data = {
         character: context.character,
         current_step: context.currentStep,
         previous_choices: context.previousChoices,
         quest_theme: context.questTheme,
         difficulty: context.difficulty,
         step_count: stepCount
-      }, {
+      };
+      
+      console.log('Quest API Request:', { url, data });
+      
+      const response = await axios.post(url, data, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -64,6 +69,13 @@ class QuestApiService {
       }
     } catch (error) {
       console.error('Quest generation API error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        url: error.config?.url
+      });
       // Return fallback quest steps
       return this.getFallbackQuest(stepCount);
     }
@@ -98,79 +110,79 @@ class QuestApiService {
   }
 
   // Fallback quest steps when API is unavailable
-  private getFallbackQuest(stepCount: number): QuestStep[] {
+  public getFallbackQuest(stepCount: number): QuestStep[] {
     const fallbackSteps: QuestStep[] = [
       {
         id: 'fallback_start',
-        title: 'Начало приключения',
-        description: 'Вы просыпаетесь в темной комнате. Голова болит, и вы не помните, как сюда попали. В углу комнаты стоит загадочная фигура.',
+        title: 'Пробуждение в Ревяхоле',
+        description: 'Вы просыпаетесь в грязном номере отеля "Вершина". Голова раскалывается от похмелья, а в зеркале отражается лицо детектива с путаными мыслями. На полу валяется пустая бутылка, а в кармане — значок полиции. Что-то определенно пошло не так.',
         choices: [
           {
-            id: 'approach',
-            text: 'Подойти к фигуре',
-            result: 'Вы решаете подойти ближе...',
-            statModifier: { stat: 'logic', value: 1 }
+            id: 'check_badge',
+            text: 'Изучить значок полиции',
+            result: 'На значке выгравировано: "Гарри Дюбуа, Ревяхольская полиция". Ваша память начинает возвращаться...',
+            statModifier: { stat: 'logic', value: 2 }
           },
           {
-            id: 'observe',
-            text: 'Внимательно осмотреться',
-            result: 'Вы начинаете изучать комнату...',
-            statModifier: { stat: 'perception', value: 1 }
+            id: 'examine_room',
+            text: 'Осмотреть номер',
+            result: 'Комната выглядит как место преступления. На стене висит портрет женщины, а на столе лежит записка с адресом...',
+            statModifier: { stat: 'perception', value: 2 }
           },
           {
-            id: 'shout',
-            text: 'Крикнуть: "Кто здесь?!"',
-            result: 'Ваш голос эхом отдается по комнате...',
-            statModifier: { stat: 'volition', value: 1 }
+            id: 'talk_to_mirror',
+            text: 'Поговорить с отражением',
+            result: 'Ваше отражение отвечает: "Ты снова все испортил, Гарри. Но у тебя есть шанс все исправить."',
+            statModifier: { stat: 'inland_empire', value: 2 }
           }
         ]
       },
       {
         id: 'fallback_second',
-        title: 'Встреча с незнакомцем',
-        description: 'Фигура поворачивается к вам. Это человек в длинном плаще, лицо скрыто в тени. Он протягивает руку с каким-то предметом.',
+        title: 'Встреча с Кимом',
+        description: 'Дверь номера открывается, и входит ваш напарник — лейтенант Ким Кицураги. Он смотрит на вас с выражением, которое можно описать как "снова?". "Дюбуа, у нас есть дело. Труп в парке. И судя по всему, это не самоубийство."',
         choices: [
           {
-            id: 'take_item',
-            text: 'Взять предмет',
-            result: 'Вы берете предмет...',
-            statModifier: { stat: 'endurance', value: 1 }
+            id: 'ask_details',
+            text: 'Узнать детали дела',
+            result: '"Жертва — бывший полицейский. Висит на дереве, но веревка не его. Кто-то его повесил." Ким протягивает фотографии.',
+            statModifier: { stat: 'rhetoric', value: 2 }
           },
           {
-            id: 'ask_questions',
-            text: 'Задать вопросы',
-            result: 'Вы начинаете расспрашивать...',
-            statModifier: { stat: 'empathy', value: 1 }
+            id: 'check_photos',
+            text: 'Изучить фотографии',
+            result: 'На снимках видно тело мужчины средних лет. Лицо искажено ужасом. На шее — следы от веревки, но не от петли...',
+            statModifier: { stat: 'visual_calculus', value: 2 }
           },
           {
-            id: 'refuse',
-            text: 'Отказаться',
-            result: 'Вы отказываетесь...',
-            statModifier: { stat: 'composure', value: 1 }
+            id: 'ask_motivation',
+            text: 'Спросить о мотивах',
+            result: '"Возможно, это месть. Или предупреждение. В любом случае, нам нужно найти убийцу до того, как он убьет снова."',
+            statModifier: { stat: 'empathy', value: 2 }
           }
         ]
       },
       {
         id: 'fallback_third',
-        title: 'Откровение',
-        description: 'Незнакомец объясняет: "Ты в мире, где твои мысли становятся реальностью. Твои характеристики определяют, как ты воспринимаешь этот мир."',
+        title: 'Начало расследования',
+        description: 'Вы с Кимом едете к месту преступления. По дороге он рассказывает: "Жертва — капитан Рене Арно. Уволился из полиции год назад после скандала с коррупцией. Многие считали, что он получил по заслугам."',
         choices: [
           {
-            id: 'accept',
-            text: 'Принять это как данность',
-            result: 'Вы понимаете, что это новый мир возможностей.',
-            statModifier: { stat: 'logic', value: 2 }
+            id: 'ask_scandal',
+            text: 'Узнать о скандале',
+            result: '"Арно брал взятки от наркоторговцев. Но некоторые говорят, что он работал под прикрытием. Правду знает только он."',
+            statModifier: { stat: 'authority', value: 2 }
           },
           {
-            id: 'question',
-            text: 'Задать больше вопросов',
-            result: 'Вы начинаете расспрашивать о деталях...',
-            statModifier: { stat: 'empathy', value: 1 }
+            id: 'check_connections',
+            text: 'Проверить связи',
+            result: 'В вашей памяти всплывают имена: "Мартинез", "Клаасье", "Эллис". Все они были связаны с делом Арно...',
+            statModifier: { stat: 'espirit_de_corps', value: 2 }
           },
           {
-            id: 'resist',
-            text: 'Сопротивляться этому',
-            result: 'Вы пытаетесь найти логическое объяснение...',
+            id: 'prepare_mentally',
+            text: 'Подготовиться морально',
+            result: 'Вы готовитесь к тому, что увидите. Смерть всегда тяжела, но это ваша работа — найти правду.',
             statModifier: { stat: 'volition', value: 2 }
           }
         ]

@@ -76,19 +76,22 @@ export default function DemoQuest({ character, onClose }: DemoQuestProps) {
   const generateQuest = async () => {
     setIsGenerating(true);
     try {
-      const context: QuestContext = {
-        character: characterState,
-        currentStep: 0,
-        previousChoices: [],
-        questTheme: 'Детективное расследование в стиле Disco Elysium',
-        difficulty: 'medium'
-      };
-
-      // Генерируем 2 шага для демо
-      const steps = await questApiService.generateFullQuest(context, 2);
-      setQuestSteps(steps);
+      // Временно используем только заглушки для настройки интерфейса
+      console.log('🎭 Используем заглушки для настройки интерфейса');
+      
+      // Имитируем задержку генерации
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Используем fallback данные
+      const fallbackSteps = questApiService.getFallbackQuest(3);
+      setQuestSteps(fallbackSteps);
+      
+      console.log('✅ Заглушки загружены:', fallbackSteps);
     } catch (error) {
-      console.error('Failed to generate quest:', error);
+      console.error('Ошибка загрузки заглушек:', error);
+      // Используем минимальные fallback данные
+      const fallbackSteps = questApiService.getFallbackQuest(2);
+      setQuestSteps(fallbackSteps);
     } finally {
       setIsGenerating(false);
     }
@@ -139,8 +142,16 @@ export default function DemoQuest({ character, onClose }: DemoQuestProps) {
                 <span className="text-2xl">🎭</span>
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">AI Демо-квест</h2>
-                <p className="text-purple-200 text-sm">Тестирование персонажа: {characterState.name}</p>
+                <h2 className="text-xl font-bold text-white">Демо-квест</h2>
+                <p className="text-purple-200 text-sm">Интерактивное приключение в стиле Disco Elysium</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs px-2 py-1 bg-yellow-500/30 text-yellow-200 rounded">
+                    🎮 Демо-режим
+                  </span>
+                  <span className="text-xs px-2 py-1 bg-blue-500/30 text-blue-200 rounded">
+                    📚 Заглушки
+                  </span>
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -221,9 +232,14 @@ export default function DemoQuest({ character, onClose }: DemoQuestProps) {
                         <div className="flex items-center justify-between">
                           <span className="text-white font-medium">{choice.text}</span>
                           {choice.statModifier && (
-                            <span className="text-xs text-gray-400">
-                              {choice.statModifier.value > 0 ? '+' : ''}{choice.statModifier.value} {choice.statModifier.stat}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-400">
+                                {choice.statModifier.value > 0 ? '+' : ''}{choice.statModifier.value}
+                              </span>
+                              <span className="text-xs px-2 py-1 bg-purple-600/30 text-purple-300 rounded">
+                                {choice.statModifier.stat}
+                              </span>
+                            </div>
                           )}
                         </div>
                         {!canMakeChoice(choice) && (
@@ -239,17 +255,36 @@ export default function DemoQuest({ character, onClose }: DemoQuestProps) {
 
               {/* Character Stats */}
               <div className="mt-8 pt-6 border-t border-gray-700">
-                <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
                   <span className="text-blue-400">📊</span>
-                  Характеристики персонажа
+                  Характеристики Гарри Дюбуа
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {Object.entries(characterState.stats || {}).map(([key, stat]) => (
-                    <div key={key} className="text-center">
-                      <div className="text-xs text-gray-400">{stat.name}</div>
-                      <div className="text-lg font-bold text-white">{stat.value}</div>
-                    </div>
-                  ))}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {Object.entries(characterState.stats || {}).map(([key, stat]) => {
+                    const value = stat.value;
+                    const getStatColor = (val: number) => {
+                      if (val >= 6) return 'text-green-400';
+                      if (val >= 4) return 'text-yellow-400';
+                      if (val >= 2) return 'text-orange-400';
+                      return 'text-red-400';
+                    };
+                    const getStatBg = (val: number) => {
+                      if (val >= 6) return 'bg-green-600/20 border-green-500/30';
+                      if (val >= 4) return 'bg-yellow-600/20 border-yellow-500/30';
+                      if (val >= 2) return 'bg-orange-600/20 border-orange-500/30';
+                      return 'bg-red-600/20 border-red-500/30';
+                    };
+                    
+                    return (
+                      <div key={key} className={`p-3 rounded-lg border ${getStatBg(value)}`}>
+                        <div className="text-xs text-gray-300 mb-1">{stat.name}</div>
+                        <div className={`text-xl font-bold ${getStatColor(value)}`}>{value}</div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {value >= 6 ? 'Отлично' : value >= 4 ? 'Хорошо' : value >= 2 ? 'Средне' : 'Плохо'}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
