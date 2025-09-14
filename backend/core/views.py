@@ -3,6 +3,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.core.exceptions import ValidationError
+from .quest_generator import quest_generator
 from .models import (
     Project, UserProfile, GameProject, DialogueNode, DialogueLink, CharacterStat,
     Character, NPC, Dialogue, Post, SkillCheck, DialogueOption, RollResult,
@@ -1224,3 +1225,89 @@ def _save_export_file(export_data, project, format_type, export_session_id):
         f.write(export_data)
     
     return file_path
+
+
+# Quest Generation API
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def generate_quest(request):
+    """
+    Generate AI-powered quest steps
+    """
+    try:
+        data = request.data
+        
+        # Validate required fields
+        character = data.get('character', {})
+        if not character:
+            return Response(
+                {'error': 'Character data is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Build context for quest generation
+        context = {
+            'character': character,
+            'current_step': data.get('current_step', 0),
+            'previous_choices': data.get('previous_choices', []),
+            'quest_theme': data.get('quest_theme', 'Детективное расследование в стиле Disco Elysium'),
+            'difficulty': data.get('difficulty', 'medium')
+        }
+        
+        # Generate quest steps
+        step_count = data.get('step_count', 2)  # Default 2 steps for demo
+        quest_steps = quest_generator.generate_full_quest(context, step_count)
+        
+        return Response({
+            'success': True,
+            'quest_steps': quest_steps,
+            'context': context
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Quest generation failed: {str(e)}'}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def generate_quest_step(request):
+    """
+    Generate a single quest step
+    """
+    try:
+        data = request.data
+        
+        # Validate required fields
+        character = data.get('character', {})
+        if not character:
+            return Response(
+                {'error': 'Character data is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Build context for quest generation
+        context = {
+            'character': character,
+            'current_step': data.get('current_step', 0),
+            'previous_choices': data.get('previous_choices', []),
+            'quest_theme': data.get('quest_theme', 'Детективное расследование в стиле Disco Elysium'),
+            'difficulty': data.get('difficulty', 'medium')
+        }
+        
+        # Generate single quest step
+        quest_step = quest_generator.generate_quest_step(context)
+        
+        return Response({
+            'success': True,
+            'quest_step': quest_step,
+            'context': context
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Quest step generation failed: {str(e)}'}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

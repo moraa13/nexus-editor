@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { DiscoElysiumCharacter } from '../../types/discoElysium';
-import { questGenerator, type QuestStep as AIStep, type QuestContext } from '../../services/questGenerator';
+import { questApiService, type QuestStep as AIStep, type QuestContext } from '../../services/questApi';
 
 interface DemoQuestProps {
   character?: DiscoElysiumCharacter | null;
@@ -72,7 +72,7 @@ export default function DemoQuest({ character, onClose }: DemoQuestProps) {
       };
 
       // Генерируем 2 шага для демо
-      const steps = await questGenerator.generateFullQuest(context, 2);
+      const steps = await questApiService.generateFullQuest(context, 2);
       setQuestSteps(steps);
     } catch (error) {
       console.error('Failed to generate quest:', error);

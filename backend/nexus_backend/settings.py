@@ -173,3 +173,6 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
     ],
 }
+
+# AI Settings
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
