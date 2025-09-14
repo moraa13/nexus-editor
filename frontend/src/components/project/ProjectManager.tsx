@@ -243,3 +243,4 @@ export default function ProjectManager({ currentProject, onProjectChange, onClos
     </div>
   );
 }
+

@@ -2,6 +2,9 @@ from django.db import models
 from django.conf import settings
 import uuid
 
+# Import the unified Character model from core
+from core.models import Character
+
 UUID = models.UUIDField
 
 ATTRS = (
@@ -54,48 +57,8 @@ class Scene(TimeStamped):
     def __str__(self): return self.name
 
 
-class Character(TimeStamped):
-    id = UUID(primary_key=True, default=uuid.uuid4, editable=False)
-    project = models.ForeignKey("dialogue.Project", on_delete=models.CASCADE, related_name="characters")
-    name = models.CharField(max_length=120)
-    portrait = models.URLField(blank=True)
-
-    # 4 ATTRS (base 1..6 typical)
-    intellect = models.IntegerField(default=2)
-    psyche = models.IntegerField(default=2)
-    physique = models.IntegerField(default=2)
-    motorics = models.IntegerField(default=2)
-
-    # 24 skills (defaults 2)
-    logic = models.IntegerField(default=2)
-    encyclopedia = models.IntegerField(default=2)
-    rhetoric = models.IntegerField(default=2)
-    drama = models.IntegerField(default=2)
-    conceptualization = models.IntegerField(default=2)
-    visual_calculus = models.IntegerField(default=2)
-
-    volition = models.IntegerField(default=2)
-    inland_empire = models.IntegerField(default=2)
-    empathy = models.IntegerField(default=2)
-    authority = models.IntegerField(default=2)
-    suggestion = models.IntegerField(default=2)
-    espirit_de_corps = models.IntegerField(default=2)
-
-    endurance = models.IntegerField(default=2)
-    pain_threshold = models.IntegerField(default=2)
-    physical_instrument = models.IntegerField(default=2)
-    electrochemistry = models.IntegerField(default=2)
-    shivers = models.IntegerField(default=2)
-    half_light = models.IntegerField(default=2)
-
-    hand_eye_coordination = models.IntegerField(default=2)
-    perception = models.IntegerField(default=2)
-    reaction_speed = models.IntegerField(default=2)
-    savoir_faire = models.IntegerField(default=2)
-    interfacing = models.IntegerField(default=2)
-    composure = models.IntegerField(default=2)
-
-    def __str__(self): return self.name
+# Character model moved to core.models.Character
+# Import it with: from core.models import Character
 
 
 class DialogueNode(TimeStamped):

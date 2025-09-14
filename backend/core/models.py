@@ -94,9 +94,47 @@ class CharacterStat(BaseModel):
 
 
 class Character(BaseModel):
+    """
+    Unified Character model combining both core and dialogue character models.
+    Includes all fields from both models with proper validation.
+    """
     name = models.CharField(max_length=200)
     portrait = models.URLField(blank=True)
-    # 24 characteristics (integers) with validation
+    
+    # Project relationship (from dialogue model)
+    project = models.ForeignKey(
+        GameProject, 
+        on_delete=models.CASCADE, 
+        related_name="characters",
+        null=True, 
+        blank=True,
+        help_text="Project this character belongs to"
+    )
+    
+    # 4 main attributes (from dialogue model)
+    intellect = models.IntegerField(
+        default=2, 
+        validators=[MinValueValidator(1), MaxValueValidator(20)],
+        help_text="Intellect attribute (1-20)"
+    )
+    psyche = models.IntegerField(
+        default=2, 
+        validators=[MinValueValidator(1), MaxValueValidator(20)],
+        help_text="Psyche attribute (1-20)"
+    )
+    physique = models.IntegerField(
+        default=2, 
+        validators=[MinValueValidator(1), MaxValueValidator(20)],
+        help_text="Physique attribute (1-20)"
+    )
+    motorics = models.IntegerField(
+        default=2, 
+        validators=[MinValueValidator(1), MaxValueValidator(20)],
+        help_text="Motorics attribute (1-20)"
+    )
+    
+    # 24 skills (integers) with validation
+    # Intellect skills
     logic = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
     encyclopedia = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
     rhetoric = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
@@ -104,6 +142,7 @@ class Character(BaseModel):
     conceptualization = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
     visual_calculus = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
 
+    # Psyche skills
     volition = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
     inland_empire = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
     empathy = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
@@ -111,6 +150,7 @@ class Character(BaseModel):
     suggestion = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
     espirit_de_corps = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
 
+    # Physique skills
     endurance = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
     pain_threshold = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
     physical_instrument = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
@@ -118,6 +158,7 @@ class Character(BaseModel):
     shivers = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
     half_light = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
 
+    # Motorics skills
     hand_eye_coordination = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
     perception = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
     reaction_speed = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
@@ -125,8 +166,82 @@ class Character(BaseModel):
     interfacing = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
     composure = models.IntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(20)])
 
+    class Meta:
+        verbose_name = "Character"
+        verbose_name_plural = "Characters"
+        ordering = ['name']
+
     def __str__(self) -> str:
         return self.name
+    
+    def get_intellect_skills(self):
+        """Returns all intellect skills as a dictionary"""
+        return {
+            'logic': self.logic,
+            'encyclopedia': self.encyclopedia,
+            'rhetoric': self.rhetoric,
+            'drama': self.drama,
+            'conceptualization': self.conceptualization,
+            'visual_calculus': self.visual_calculus,
+        }
+    
+    def get_psyche_skills(self):
+        """Returns all psyche skills as a dictionary"""
+        return {
+            'volition': self.volition,
+            'inland_empire': self.inland_empire,
+            'empathy': self.empathy,
+            'authority': self.authority,
+            'suggestion': self.suggestion,
+            'espirit_de_corps': self.espirit_de_corps,
+        }
+    
+    def get_physique_skills(self):
+        """Returns all physique skills as a dictionary"""
+        return {
+            'endurance': self.endurance,
+            'pain_threshold': self.pain_threshold,
+            'physical_instrument': self.physical_instrument,
+            'electrochemistry': self.electrochemistry,
+            'shivers': self.shivers,
+            'half_light': self.half_light,
+        }
+    
+    def get_motorics_skills(self):
+        """Returns all motorics skills as a dictionary"""
+        return {
+            'hand_eye_coordination': self.hand_eye_coordination,
+            'perception': self.perception,
+            'reaction_speed': self.reaction_speed,
+            'savoir_faire': self.savoir_faire,
+            'interfacing': self.interfacing,
+            'composure': self.composure,
+        }
+    
+    def get_all_skills(self):
+        """Returns all skills organized by category"""
+        return {
+            'intellect': self.get_intellect_skills(),
+            'psyche': self.get_psyche_skills(),
+            'physique': self.get_physique_skills(),
+            'motorics': self.get_motorics_skills(),
+        }
+    
+    def get_skill_value(self, skill_name):
+        """Gets the value of a specific skill"""
+        return getattr(self, skill_name, 0)
+    
+    def get_attribute_total(self, attribute):
+        """Gets total points for an attribute including all its skills"""
+        if attribute == 'intellect':
+            return self.intellect + sum(self.get_intellect_skills().values())
+        elif attribute == 'psyche':
+            return self.psyche + sum(self.get_psyche_skills().values())
+        elif attribute == 'physique':
+            return self.physique + sum(self.get_physique_skills().values())
+        elif attribute == 'motorics':
+            return self.motorics + sum(self.get_motorics_skills().values())
+        return 0
 
 
 class NPC(BaseModel):

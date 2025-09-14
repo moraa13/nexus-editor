@@ -7,9 +7,10 @@ import {
   type DiscoElysiumStat,
   generateId 
 } from '../../types/discoElysium';
+import type { Character } from '../../types/character';
 
 interface CharacterCreatorProps {
-  onSave?: (character: DiscoElysiumCharacter) => void;
+  onSave?: (character: Character) => void;
   onCancel?: () => void;
   compact?: boolean;
   onStatSelect?: (stat: string, description: string, history: string, skills: string[], icon?: string, category?: string, categoryName?: string) => void;
@@ -51,11 +52,14 @@ export default function CharacterCreator({ onSave, onCancel, compact = false, on
     }
 
     const newStats = { ...stats };
+    const oldValue = newStats[statKey];
     newStats[statKey] = value;
     
     // Check if we have enough points (subtract base value of 1 for each stat)
     const newTotal = Object.values(newStats).reduce((sum, val) => sum + (val - 1), 0);
-    if (newTotal <= CHARACTER_CREATION.TOTAL_POINTS) {
+    
+    // Allow temporary over-spending during drag, but prevent final save
+    if (newTotal <= CHARACTER_CREATION.TOTAL_POINTS || value < oldValue) {
       setStats(newStats);
     }
   };
@@ -77,39 +81,53 @@ export default function CharacterCreator({ onSave, onCancel, compact = false, on
   };
 
   // Create character object
-  const createCharacter = (): DiscoElysiumCharacter => {
-    const characterStats: DiscoElysiumCharacter['stats'] = {} as any;
-    
-    Object.entries(stats).forEach(([statKey, value]) => {
-      const statDef = CHARACTER_STATS[statKey as keyof typeof CHARACTER_STATS];
-      const category = STAT_CATEGORIES[statDef.category];
-      
-      characterStats[statKey as keyof DiscoElysiumCharacter['stats']] = {
-        id: generateId('stat'),
-        name: statDef.name,
-        shortName: statDef.shortName,
-        category: statDef.category,
-        description: statDef.description,
-        color: category.color,
-        icon: statDef.icon,
-        value: value,
-        modifier: value - 5, // Modifier for 0-10 range
-        isActive: true,
-        isLocked: false
-      };
-    });
+  const createCharacter = (): Character => {
+    // Calculate main attributes from skills
+    const intellect = Math.round((stats.logic + stats.encyclopedia + stats.rhetoric + stats.drama + stats.conceptualization + stats.visual_calculus) / 6);
+    const psyche = Math.round((stats.volition + stats.inland_empire + stats.empathy + stats.authority + stats.espirit_de_corps + stats.suggestion) / 6);
+    const physique = Math.round((stats.endurance + stats.pain_threshold + stats.physical_instrument + stats.electrochemistry + stats.shivers + stats.half_light) / 6);
+    const motorics = Math.round((stats.hand_eye_coordination + stats.perception + stats.reaction_speed + stats.savoir_faire + stats.interfacing + stats.composure) / 6);
 
     return {
       id: generateId('character'),
       name: characterName || 'Безымянный персонаж',
-      stats: characterStats,
-      level: 1,
-      experience: 0,
-      experienceToNext: 100,
-      health: 100,
-      maxHealth: 100,
-      morale: 100,
-      maxMorale: 100
+      portrait: '',
+      project: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      // Main attributes
+      intellect,
+      psyche,
+      physique,
+      motorics,
+      // Intellect skills
+      logic: stats.logic,
+      encyclopedia: stats.encyclopedia,
+      rhetoric: stats.rhetoric,
+      drama: stats.drama,
+      conceptualization: stats.conceptualization,
+      visual_calculus: stats.visual_calculus,
+      // Psyche skills
+      volition: stats.volition,
+      inland_empire: stats.inland_empire,
+      empathy: stats.empathy,
+      authority: stats.authority,
+      espirit_de_corps: stats.espirit_de_corps,
+      suggestion: stats.suggestion,
+      // Physique skills
+      endurance: stats.endurance,
+      pain_threshold: stats.pain_threshold,
+      physical_instrument: stats.physical_instrument,
+      electrochemistry: stats.electrochemistry,
+      shivers: stats.shivers,
+      half_light: stats.half_light,
+      // Motorics skills
+      hand_eye_coordination: stats.hand_eye_coordination,
+      perception: stats.perception,
+      reaction_speed: stats.reaction_speed,
+      savoir_faire: stats.savoir_faire,
+      interfacing: stats.interfacing,
+      composure: stats.composure
     };
   };
 
@@ -152,7 +170,8 @@ export default function CharacterCreator({ onSave, onCancel, compact = false, on
               max={CHARACTER_CREATION.MAX_STAT_VALUE}
               value={currentValue}
               onChange={(e) => updateStat(statKey, parseInt(e.target.value))}
-              className="w-full h-3 rounded-lg appearance-none cursor-pointer slider transition-all duration-300 hover:scale-105"
+              onInput={(e) => updateStat(statKey, parseInt(e.currentTarget.value))}
+              className="w-full h-3 rounded-lg appearance-none cursor-pointer slider transition-all duration-150 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               style={{
                 background: `linear-gradient(to right, ${color} 0%, ${color} ${(currentValue / CHARACTER_CREATION.MAX_STAT_VALUE) * 100}%, #374151 ${(currentValue / CHARACTER_CREATION.MAX_STAT_VALUE) * 100}%, #374151 100%)`,
                 boxShadow: `0 0 10px ${color}40, inset 0 2px 4px rgba(0,0,0,0.2)`
@@ -211,7 +230,8 @@ export default function CharacterCreator({ onSave, onCancel, compact = false, on
               max={CHARACTER_CREATION.MAX_STAT_VALUE}
               value={currentValue}
               onChange={(e) => updateStat(statKey, parseInt(e.target.value))}
-              className="w-full h-2 rounded-lg appearance-none cursor-pointer slider transition-all duration-300 hover:scale-105"
+              onInput={(e) => updateStat(statKey, parseInt(e.currentTarget.value))}
+              className="w-full h-2 rounded-lg appearance-none cursor-pointer slider transition-all duration-150 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               style={{
                 background: `linear-gradient(to right, ${color} 0%, ${color} ${(currentValue / CHARACTER_CREATION.MAX_STAT_VALUE) * 100}%, #4B5563 ${(currentValue / CHARACTER_CREATION.MAX_STAT_VALUE) * 100}%, #4B5563 100%)`,
                 boxShadow: `0 0 8px ${color}30, inset 0 1px 2px rgba(0,0,0,0.2)`

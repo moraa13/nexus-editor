@@ -307,3 +307,4 @@ function getTypeColor(type: SearchResult['type']): string {
   }
 }
 
+

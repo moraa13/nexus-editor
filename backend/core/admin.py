@@ -24,23 +24,27 @@ class GameProjectAdmin(admin.ModelAdmin):
 
 @admin.register(Character)
 class CharacterAdmin(admin.ModelAdmin):
-    list_display = ['name', 'logic', 'empathy', 'authority', 'created_at']
-    list_filter = ['created_at']
+    list_display = ['name', 'project', 'intellect', 'psyche', 'physique', 'motorics', 'created_at']
+    list_filter = ['created_at', 'project']
     search_fields = ['name']
     fieldsets = (
         ('Basic Info', {
-            'fields': ('name', 'portrait')
+            'fields': ('name', 'portrait', 'project')
         }),
-        ('Intellect', {
+        ('Main Attributes', {
+            'fields': ('intellect', 'psyche', 'physique', 'motorics'),
+            'description': 'Main attribute scores (1-20)'
+        }),
+        ('Intellect Skills', {
             'fields': ('logic', 'encyclopedia', 'rhetoric', 'drama', 'conceptualization', 'visual_calculus')
         }),
-        ('Psyche', {
+        ('Psyche Skills', {
             'fields': ('volition', 'inland_empire', 'empathy', 'authority', 'suggestion', 'espirit_de_corps')
         }),
-        ('Physique', {
+        ('Physique Skills', {
             'fields': ('endurance', 'pain_threshold', 'physical_instrument', 'electrochemistry', 'shivers', 'half_light')
         }),
-        ('Motorics', {
+        ('Motorics Skills', {
             'fields': ('hand_eye_coordination', 'perception', 'reaction_speed', 'savoir_faire', 'interfacing', 'composure')
         }),
     )

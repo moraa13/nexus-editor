@@ -121,3 +121,4 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
 
 Откройте http://localhost:5173 в браузере и начните создавать свои приключения!
 
+

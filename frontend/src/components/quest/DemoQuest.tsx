@@ -300,3 +300,4 @@ export default function DemoQuest({ character, onClose }: DemoQuestProps) {
     </div>
   );
 }
+

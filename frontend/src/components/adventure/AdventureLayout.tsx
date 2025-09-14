@@ -12,9 +12,10 @@ import { ProjectManager as PM } from '../../types/project';
 
 interface AdventureLayoutProps {
   children?: React.ReactNode;
+  onNavigateToLanding?: () => void;
 }
 
-export default function AdventureLayout({ children: _ }: AdventureLayoutProps) {
+export default function AdventureLayout({ children: _, onNavigateToLanding }: AdventureLayoutProps) {
   const [activeSection, setActiveSection] = useState<'characters' | 'events' | 'branches' | 'projects'>('characters');
   const [selectedAction, setSelectedAction] = useState<'create-character' | 'create-event' | 'event-branch' | 'open-project' | 'game-setting' | 'game-tone' | 'manage-projects' | null>(null);
   const [selectedCharacterStat, setSelectedCharacterStat] = useState<{
@@ -140,10 +141,17 @@ export default function AdventureLayout({ children: _ }: AdventureLayoutProps) {
         </div>
         
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-            <span className="text-white text-xs">🔒</span>
-          </div>
-          <span className="text-white font-medium">Выйти</span>
+          {onNavigateToLanding && (
+            <button
+              onClick={onNavigateToLanding}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
+            >
+              <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs">←</span>
+              </div>
+              <span className="text-white font-medium">Назад</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -219,18 +227,18 @@ export default function AdventureLayout({ children: _ }: AdventureLayoutProps) {
                             <span className="text-2xl">🎮</span>
                           </div>
                           <div className="flex-1">
-                            <h4 className="text-white font-semibold">{characters[0].name}</h4>
+                            <h4 className="text-white font-semibold">{characters[0].name || 'Безымянный'}</h4>
                             <p className="text-gray-400 text-xs">Главный герой новеллы</p>
                           </div>
                         </div>
                         <div className="space-y-2">
                           <div className="flex justify-between text-xs">
                             <span className="text-gray-400">Уровень:</span>
-                            <span className="text-white">{characters[0].level}</span>
+                            <span className="text-white">{characters[0].level || 1}</span>
                           </div>
                           <div className="flex justify-between text-xs">
                             <span className="text-gray-400">Очки характеристик:</span>
-                            <span className="text-white">{Object.values(characters[0].stats).reduce((sum, stat) => sum + stat.value, 0)}</span>
+                            <span className="text-white">{characters[0].stats ? Object.values(characters[0].stats).reduce((sum, stat) => sum + stat.value, 0) : 0}</span>
                           </div>
                         </div>
                         <div className="mt-3 pt-3 border-t border-gray-600 space-y-2">
@@ -756,7 +764,7 @@ export default function AdventureLayout({ children: _ }: AdventureLayoutProps) {
         {showDemoQuest && characters.length > 0 && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <DemoQuest
-              character={characters[0]}
+              character={characters[0] || null}
               onClose={() => setShowDemoQuest(false)}
             />
           </div>

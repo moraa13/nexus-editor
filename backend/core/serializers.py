@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import (
     Project, UserProfile, GameProject, DialogueNode, DialogueLink, CharacterStat, 
     Character, NPC, Dialogue, Post, SkillCheck, DialogueOption, RollResult,
-    Quest, QuestCharacter, DialogueLog, ExportSession, ExportTemplate
+    Quest, QuestObjective, QuestCharacter, DialogueLog, ExportSession, ExportTemplate
 )
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -42,9 +42,42 @@ class CharacterStatSerializer(serializers.ModelSerializer):
 
 
 class CharacterSerializer(serializers.ModelSerializer):
+    # Computed fields for skill totals
+    intellect_total = serializers.SerializerMethodField()
+    psyche_total = serializers.SerializerMethodField()
+    physique_total = serializers.SerializerMethodField()
+    motorics_total = serializers.SerializerMethodField()
+    
     class Meta:
         model = Character
-        fields = "__all__"
+        fields = [
+            "id", "name", "portrait", "project",
+            # Main attributes
+            "intellect", "psyche", "physique", "motorics",
+            # Intellect skills
+            "logic", "encyclopedia", "rhetoric", "drama", "conceptualization", "visual_calculus",
+            # Psyche skills
+            "volition", "inland_empire", "empathy", "authority", "suggestion", "espirit_de_corps",
+            # Physique skills
+            "endurance", "pain_threshold", "physical_instrument", "electrochemistry", "shivers", "half_light",
+            # Motorics skills
+            "hand_eye_coordination", "perception", "reaction_speed", "savoir_faire", "interfacing", "composure",
+            # Computed totals
+            "intellect_total", "psyche_total", "physique_total", "motorics_total",
+            "created_at", "updated_at"
+        ]
+    
+    def get_intellect_total(self, obj):
+        return obj.get_attribute_total('intellect')
+    
+    def get_psyche_total(self, obj):
+        return obj.get_attribute_total('psyche')
+    
+    def get_physique_total(self, obj):
+        return obj.get_attribute_total('physique')
+    
+    def get_motorics_total(self, obj):
+        return obj.get_attribute_total('motorics')
 
 
 class NPCSerializer(serializers.ModelSerializer):

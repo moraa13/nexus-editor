@@ -1,15 +1,5 @@
 import { api } from "../lib/api";
-
-export interface Character {
-  id?: string;
-  name: string;
-  portrait?: string;
-  logic?: number; encyclopedia?: number; rhetoric?: number; drama?: number; conceptualization?: number; visual_calculus?: number;
-  volition?: number; inland_empire?: number; empathy?: number; authority?: number; suggestion?: number; espirit_de_corps?: number;
-  endurance?: number; pain_threshold?: number; physical_instrument?: number; electrochemistry?: number; shivers?: number; half_light?: number;
-  hand_eye_coordination?: number; perception?: number; reaction_speed?: number; savoir_faire?: number; interfacing?: number; composure?: number;
-  created_at?: string; updated_at?: string;
-}
+import type { Character } from "../types/character";
 
 const base = "/characters/";
 

@@ -259,3 +259,4 @@ export default function TonePanel({ currentTone, onToneChange, compact = false, 
     </div>
   );
 }
+

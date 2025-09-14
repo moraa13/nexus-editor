@@ -95,3 +95,4 @@ The interface is designed to work on:
 - **Character Levels**: Progress through RPG-style character development
 - **Visual Feedback**: Immediate rewards through animations and effects
 
+
