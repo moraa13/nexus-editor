@@ -2,7 +2,8 @@ import random
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from .models import Project, Scene, Character, DialogueNode, DialogueEdge, SkillCheck
+from .models import Project, Scene, DialogueNode, DialogueEdge, SkillCheck
+from core.models import Character
 from .serializers import (
     ProjectSerializer, SceneSerializer, CharacterSerializer,
     DialogueNodeSerializer, DialogueEdgeSerializer, SkillCheckSerializer

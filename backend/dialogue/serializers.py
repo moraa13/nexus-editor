@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Project, Scene, Character, DialogueNode, DialogueEdge, SkillCheck
+from .models import Project, Scene, DialogueNode, DialogueEdge, SkillCheck
+from core.models import Character
 
 
 class ProjectSerializer(serializers.ModelSerializer):

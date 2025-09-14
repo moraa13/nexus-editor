@@ -1,8 +1,7 @@
 import React from 'react';
-import type { Character } from '../../types/character';
+import { useCharacters } from '../../stores/adventureStore';
 
 interface CharacterPanelProps {
-  characters: Character[];
   activeSection: 'characters' | 'events' | 'branches' | 'projects';
   setActiveSection: (section: 'characters' | 'events' | 'branches' | 'projects') => void;
   onCharacterEdit: () => void;
@@ -10,12 +9,12 @@ interface CharacterPanelProps {
 }
 
 export default function CharacterPanel({ 
-  characters, 
   activeSection, 
   setActiveSection, 
   onCharacterEdit,
   onDemoQuest 
 }: CharacterPanelProps) {
+  const characters = useCharacters();
   return (
     <div className="w-64 bg-gray-800 border-r border-gray-700 flex flex-col">
       {/* Navigation */}
@@ -92,8 +91,8 @@ export default function CharacterPanel({
                       <div className="flex justify-between text-xs">
                         <span className="text-gray-400">Очки характеристик:</span>
                         <span className="text-white">
-                          {characters[0].intellect_total + characters[0].psyche_total + 
-                           characters[0].physique_total + characters[0].motorics_total}
+                          {characters[0].intellect + characters[0].psyche + 
+                           characters[0].physique + characters[0].motorics}
                         </span>
                       </div>
                     </div>
