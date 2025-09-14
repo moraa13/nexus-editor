@@ -110,6 +110,7 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
   };
 
   return (
+    <>
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Top Header Bar */}
       <div className="bg-gray-800 border-b border-gray-700 px-6 py-4 flex items-center justify-between">
@@ -760,51 +761,52 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
         </div>
         )}
 
-        {/* Demo Quest */}
-        {showDemoQuest && (
-          <DemoQuest
-            character={characters[0] || {
-              name: 'Демо Персонаж',
-              level: 1,
-              stats: {
-                intellect: { name: 'Интеллект', value: 4 },
-                psyche: { name: 'Психика', value: 4 },
-                physique: { name: 'Физика', value: 4 },
-                motorics: { name: 'Моторика', value: 4 }
-              },
-              skills: {
-                logic: { name: 'Логика', value: 2 },
-                encyclopedia: { name: 'Энциклопедия', value: 2 },
-                rhetoric: { name: 'Риторика', value: 2 },
-                drama: { name: 'Драма', value: 2 },
-                conceptualization: { name: 'Концептуализация', value: 2 },
-                visual_calculus: { name: 'Визуальное исчисление', value: 2 },
-                volition: { name: 'Воля', value: 2 },
-                inland_empire: { name: 'Внутренняя империя', value: 2 },
-                empathy: { name: 'Эмпатия', value: 2 },
-                authority: { name: 'Авторитет', value: 2 },
-                suggestion: { name: 'Внушение', value: 2 },
-                espirit_de_corps: { name: 'Дух корпуса', value: 2 },
-                endurance: { name: 'Выносливость', value: 2 },
-                pain_threshold: { name: 'Порог боли', value: 2 },
-                physical_instrument: { name: 'Физический инструмент', value: 2 },
-                electrochemistry: { name: 'Электрохимия', value: 2 },
-                shivers: { name: 'Дрожь', value: 2 },
-                half_light: { name: 'Полусвет', value: 2 },
-                hand_eye_coordination: { name: 'Координация рук и глаз', value: 2 },
-                perception: { name: 'Восприятие', value: 2 },
-                reaction_speed: { name: 'Скорость реакции', value: 2 },
-                savoir_faire: { name: 'Самообладание', value: 2 },
-                interfacing: { name: 'Интерфейс', value: 2 },
-                composure: { name: 'Спокойствие', value: 2 }
-              }
-            }}
-            onClose={() => setShowDemoQuest(false)}
-          />
-        )}
-        
         {/* Toast Container */}
         <ToastContainer />
     </div>
+    
+    {/* Demo Quest - Outside main container for proper centering */}
+    {showDemoQuest && (
+      <DemoQuest
+        character={characters[0] || {
+          name: 'Демо Персонаж',
+          level: 1,
+          stats: {
+            intellect: { name: 'Интеллект', value: 4 },
+            psyche: { name: 'Психика', value: 4 },
+            physique: { name: 'Физика', value: 4 },
+            motorics: { name: 'Моторика', value: 4 }
+          },
+          skills: {
+            logic: { name: 'Логика', value: 2 },
+            encyclopedia: { name: 'Энциклопедия', value: 2 },
+            rhetoric: { name: 'Риторика', value: 2 },
+            drama: { name: 'Драма', value: 2 },
+            conceptualization: { name: 'Концептуализация', value: 2 },
+            visual_calculus: { name: 'Визуальное исчисление', value: 2 },
+            volition: { name: 'Воля', value: 2 },
+            inland_empire: { name: 'Внутренняя империя', value: 2 },
+            empathy: { name: 'Эмпатия', value: 2 },
+            authority: { name: 'Авторитет', value: 2 },
+            suggestion: { name: 'Внушение', value: 2 },
+            espirit_de_corps: { name: 'Дух корпуса', value: 2 },
+            endurance: { name: 'Выносливость', value: 2 },
+            pain_threshold: { name: 'Порог боли', value: 2 },
+            physical_instrument: { name: 'Физический инструмент', value: 2 },
+            electrochemistry: { name: 'Электрохимия', value: 2 },
+            shivers: { name: 'Дрожь', value: 2 },
+            half_light: { name: 'Полусвет', value: 2 },
+            hand_eye_coordination: { name: 'Координация рук и глаз', value: 2 },
+            perception: { name: 'Восприятие', value: 2 },
+            reaction_speed: { name: 'Скорость реакции', value: 2 },
+            savoir_faire: { name: 'Самообладание', value: 2 },
+            interfacing: { name: 'Интерфейс', value: 2 },
+            composure: { name: 'Спокойствие', value: 2 }
+          }
+        }}
+        onClose={() => setShowDemoQuest(false)}
+      />
+    )}
+    </>
   );
 }

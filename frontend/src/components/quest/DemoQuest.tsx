@@ -18,6 +18,7 @@ export default function DemoQuest({ character, onClose }: DemoQuestProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [questSteps, setQuestSteps] = useState<AIStep[]>([]);
+  const [isVisible, setIsVisible] = useState(false);
   const [characterState, setCharacterState] = useState(character || {
     name: 'Демо Персонаж',
     level: 1,
@@ -54,6 +55,18 @@ export default function DemoQuest({ character, onClose }: DemoQuestProps) {
       composure: { name: 'Спокойствие', value: 2 }
     }
   });
+
+  // Animation effect
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
+  const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(() => {
+      onClose();
+    }, 300); // Wait for animation to complete
+  };
 
   // Генерируем квест при загрузке компонента
   useEffect(() => {
@@ -116,8 +129,8 @@ export default function DemoQuest({ character, onClose }: DemoQuestProps) {
   const isLastStep = currentStep === questSteps.length - 1;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-xl border border-gray-600 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div className={`fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`bg-gray-800 rounded-xl border border-gray-600 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 ease-out ${isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'}`}>
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4 rounded-t-xl border-b border-gray-600">
           <div className="flex items-center justify-between">
@@ -139,7 +152,7 @@ export default function DemoQuest({ character, onClose }: DemoQuestProps) {
                 {isGenerating ? '🔄 Генерация...' : '🎲 Перегенерировать'}
               </button>
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="w-8 h-8 bg-white/20 hover:bg-white/30 text-white rounded-lg flex items-center justify-center transition-colors"
               >
                 ✕
