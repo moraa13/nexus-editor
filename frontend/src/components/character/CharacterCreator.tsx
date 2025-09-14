@@ -16,26 +16,34 @@ interface CharacterCreatorProps {
   onStatSelect?: (stat: string, description: string, history: string, skills: string[], icon?: string, category?: string, categoryName?: string) => void;
 }
 
+// Function to generate random stat distribution that always sums to 0
+const generateRandomStats = (): Record<string, number> => {
+  const statKeys = Object.keys(CHARACTER_STATS);
+  const stats: Record<string, number> = {};
+  
+  // Initialize all stats to 1 (base value)
+  statKeys.forEach(key => {
+    stats[key] = 1;
+  });
+  
+  // Distribute the remaining points randomly
+  let remainingPoints = CHARACTER_CREATION.TOTAL_POINTS;
+  
+  while (remainingPoints > 0) {
+    const randomStat = statKeys[Math.floor(Math.random() * statKeys.length)];
+    if (stats[randomStat] < CHARACTER_CREATION.MAX_STAT_VALUE) {
+      stats[randomStat]++;
+      remainingPoints--;
+    }
+  }
+  
+  return stats;
+};
+
 export default function CharacterCreator({ onSave, onCancel, compact = false, onStatSelect }: CharacterCreatorProps) {
   const [characterName, setCharacterName] = useState('Герой');
   const [selectedStat, setSelectedStat] = useState<keyof typeof CHARACTER_STATS | null>(null);
-  const [stats, setStats] = useState<Record<string, number>>(() => {
-    const initialStats: Record<string, number> = {};
-    // Initialize with specific values as shown in the mockup
-    initialStats['logic'] = 4;
-    initialStats['rhetoric'] = 2;
-    initialStats['analysis'] = 3;
-    initialStats['empathy'] = 5;
-    initialStats['volition'] = 1;
-    initialStats['intuition'] = 3;
-    initialStats['endurance'] = 6;
-    initialStats['dexterity'] = 2;
-    initialStats['shivers'] = CHARACTER_CREATION.DEFAULT_STAT_VALUE;
-    initialStats['impulse'] = CHARACTER_CREATION.DEFAULT_STAT_VALUE;
-    initialStats['perception'] = CHARACTER_CREATION.DEFAULT_STAT_VALUE;
-    initialStats['composure'] = CHARACTER_CREATION.DEFAULT_STAT_VALUE;
-    return initialStats;
-  });
+  const [stats, setStats] = useState<Record<string, number>>(() => generateRandomStats());
 
   // Calculate total points used (subtract base value of 1 for each stat)
   const totalPointsUsed = useMemo(() => {
@@ -348,8 +356,17 @@ export default function CharacterCreator({ onSave, onCancel, compact = false, on
         {/* Footer */}
         {compact ? (
           <div className="mt-4 flex items-center justify-between">
-            <div className="text-sm text-white">
-              Очков: <span className="font-bold">{remainingPoints}</span>
+            <div className="flex items-center gap-3">
+              <div className="text-sm text-white">
+                Очков: <span className="font-bold">{remainingPoints}</span>
+              </div>
+              <button
+                onClick={() => setStats(generateRandomStats())}
+                className="px-3 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors text-xs font-medium"
+                title="Перераспределить очки случайно"
+              >
+                🎲 Случайно
+              </button>
             </div>
             
             <button

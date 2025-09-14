@@ -178,7 +178,7 @@ export default function DemoQuest({ character, onClose }: DemoQuestProps) {
 
   const handleChoice = (choice: QuestChoice) => {
     // Применяем модификатор к характеристикам
-    if (choice.statModifier) {
+    if (choice.statModifier && characterState.stats) {
       const newStats = { ...characterState.stats };
       const statName = choice.statModifier.stat;
       if (newStats[statName]) {
@@ -197,7 +197,7 @@ export default function DemoQuest({ character, onClose }: DemoQuestProps) {
   };
 
   const getStatValue = (statName: string): number => {
-    return characterState.stats[statName]?.value || 0;
+    return characterState.stats?.[statName]?.value || 0;
   };
 
   const canMakeChoice = (choice: QuestChoice): boolean => {
