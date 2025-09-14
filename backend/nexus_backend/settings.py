@@ -140,6 +140,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:5173",  # Vite default
     "http://127.0.0.1:5173",
+    "http://localhost:5181",  # Our Vite port
+    "http://127.0.0.1:5181",
 ]
 CORS_ALLOW_HEADERS = [
     "accept",
@@ -151,8 +153,18 @@ CORS_ALLOW_HEADERS = [
     "user-agent",
     "x-csrftoken",
     "x-requested-with",
+    "cache-control",
+    "pragma",
 ]
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
 STATIC_URL = "static/"
 
 # REST Framework settings

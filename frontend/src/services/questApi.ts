@@ -50,6 +50,11 @@ class QuestApiService {
         quest_theme: context.questTheme,
         difficulty: context.difficulty,
         step_count: stepCount
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: false, // Don't send cookies for now
       });
 
       if (response.data.success) {
@@ -73,6 +78,11 @@ class QuestApiService {
         previous_choices: context.previousChoices,
         quest_theme: context.questTheme,
         difficulty: context.difficulty
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: false, // Don't send cookies for now
       });
 
       if (response.data.success) {

@@ -1227,6 +1227,21 @@ def _save_export_file(export_data, project, format_type, export_session_id):
     return file_path
 
 
+# CORS Test endpoint
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def cors_test(request):
+    """
+    Simple endpoint to test CORS configuration
+    """
+    return Response({
+        'success': True,
+        'message': 'CORS is working!',
+        'origin': request.META.get('HTTP_ORIGIN', 'Unknown'),
+        'method': request.method
+    })
+
+
 # Quest Generation API
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])

@@ -13,7 +13,7 @@ from .views import (
     get_dialogue_tree, create_dialogue_branch, create_dialogue_option,
     start_quest, complete_quest, fail_quest, update_quest_progress,
     get_character_quests, execute_dialogue_option,
-    generate_quest, generate_quest_step,
+    generate_quest, generate_quest_step, cors_test,
 )
 from .auth_views import login, register, logout, user_profile
 
@@ -74,6 +74,9 @@ urlpatterns = [
     # Quest generation endpoints
     path("quests/generate/", generate_quest),
     path("quests/generate-step/", generate_quest_step),
+    
+    # CORS test endpoint
+    path("cors-test/", cors_test),
 ]
 urlpatterns += router.urls
 
