@@ -250,7 +250,10 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
                             ✏️ Редактировать
                           </button>
                           <button
-                            onClick={() => setShowDemoQuest(true)}
+                            onClick={() => {
+                              console.log('🎭 Opening demo quest...');
+                              setShowDemoQuest(true);
+                            }}
                             className="w-full text-xs bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-3 py-2 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                           >
                             🎭 Демо-квест
@@ -766,6 +769,7 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
     </div>
     
     {/* Demo Quest - Outside main container for proper centering */}
+    {console.log('AdventureLayout render - showDemoQuest:', showDemoQuest)}
     {showDemoQuest && (
       <DemoQuest
         character={characters[0] || {
