@@ -15,6 +15,8 @@ interface QuestChoice {
 }
 
 export default function DemoQuest({ character, onClose }: DemoQuestProps) {
+  console.log('🎭 DemoQuest component created with character:', character);
+  
   const [currentStep, setCurrentStep] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [questSteps, setQuestSteps] = useState<AIStep[]>([]);

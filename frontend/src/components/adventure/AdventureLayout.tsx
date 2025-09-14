@@ -252,7 +252,9 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
                           <button
                             onClick={() => {
                               console.log('🎭 Opening demo quest...');
+                              console.log('Current showDemoQuest state:', showDemoQuest);
                               setShowDemoQuest(true);
+                              console.log('Set showDemoQuest to true');
                             }}
                             className="w-full text-xs bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-3 py-2 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                           >
