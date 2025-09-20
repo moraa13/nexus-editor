@@ -1,0 +1,30 @@
+[33m95bb6af[m[33m ([m[1;36mHEAD -> [m[1;32mrestored-ai-agent[m[33m)[m debug: Add extreme visual debugging for modal visibility
+[33m6005078[m debug: Add detailed logging for DemoQuest visibility issue
+[33m7b47b84[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m fix: Restore normal modal styling - debug successful!
+[33m9930aed[m debug: Add extreme visual debugging for modal visibility
+[33m70baea4[m debug: Add logging and simplify DemoQuest rendering
+[33m5e603ed[m feat: Switch to fallback quest data for UI development
+[33m242ab40[m feat: Center DemoQuest modal with smooth animations
+[33m374dd01[m fix: Configure CORS for frontend-backend communication
+[33m96d5649[m refactor: Move AI quest generation to Django backend
+[33m33ffe54[m feat: AI-powered quest generation with centered modal
+[33m7e05471[m fix: DemoQuest characterState.stats undefined access
+[33m0a4a1ce[m fix: DemoQuest undefined character state initialization
+[33m9813c4f[m feat: Event and Quest editor system with Zustand integration
+[33m673caad[m feat: Zustand state management and model unification
+[33mf9cca80[m feat: Добавлен лендинг и улучшения UI
+[33m9337795[m feat: Добавлена система управления проектами и AI генерация
+[33m1df3b9d[m fix: Resolve all Adjacent JSX elements errors in AdventureLayout.tsx
+[33mafd3f13[m fix: Complete JSX structure with proper closing tags
+[33mdcb7beb[m fix: Add missing closing tags for JSX structure
+[33mde094b2[m fix: Remove final extra closing div tag
+[33m52d9335[m fix: Correct JSX structure and remove extra closing tags
+[33m0d8e3be[m fix: Remove extra closing div tag causing JSX structure error
+[33m2521a4a[m fix: Remove extra closing parenthesis causing JSX syntax error
+[33m1123b3d[m fix: Remove extra closing div tag causing JSX syntax error
+[33me1b3270[m fix: JSX syntax error in AdventureLayout
+[33md18d48d[m feat: Enhanced Reference Panel with contextual character information
+[33m3f5ad82[m fix: Correct character creation points calculation
+[33m627e872[m feat: Add stunning animations to main interface and character creation
+[33mc7a6f1c[m docs: Add comprehensive README with project overview and usage guide
+[33mc671127[m feat: Complete UI redesign with character creation and game settings

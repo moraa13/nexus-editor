@@ -142,6 +142,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:5181",  # Our Vite port
     "http://127.0.0.1:5181",
+    "http://localhost:5182",  # Current Vite port
+    "http://127.0.0.1:5182",
 ]
 CORS_ALLOW_HEADERS = [
     "accept",
@@ -188,3 +190,8 @@ REST_FRAMEWORK = {
 
 # AI Settings
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
+# OpenRouter Settings
+OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
+OPENROUTER_BASE_URL = os.getenv('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1')
+OPENROUTER_MODEL = os.getenv('OPENROUTER_MODEL', 'anthropic/claude-3.5-sonnet')

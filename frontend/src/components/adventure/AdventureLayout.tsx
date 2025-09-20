@@ -5,6 +5,7 @@ import SettingPanel from '../setting/SettingPanel';
 import TonePanel from '../setting/TonePanel';
 import ProjectManager from '../project/ProjectManager';
 import DemoQuest from '../quest/DemoQuest';
+import ChatAgent from '../ChatAgent';
 import type { DiscoElysiumCharacter, GameSetting } from '../../types/discoElysium';
 import type { ProjectSettings } from '../../types/project';
 import { AIService } from '../../services/aiService';
@@ -13,10 +14,11 @@ import { ProjectManager as PM } from '../../types/project';
 interface AdventureLayoutProps {
   children?: React.ReactNode;
   onNavigateToLanding?: () => void;
+  initialProject?: ProjectSettings | null;
 }
 
-export default function AdventureLayout({ children: _, onNavigateToLanding }: AdventureLayoutProps) {
-  const [activeSection, setActiveSection] = useState<'characters' | 'events' | 'branches' | 'projects'>('characters');
+export default function AdventureLayout({ children: _, onNavigateToLanding, initialProject }: AdventureLayoutProps) {
+  const [activeSection, setActiveSection] = useState<'characters' | 'events' | 'branches' | 'projects' | 'chat'>('characters');
   const [selectedAction, setSelectedAction] = useState<'create-character' | 'create-event' | 'event-branch' | 'open-project' | 'game-setting' | 'game-tone' | 'manage-projects' | null>(null);
   const [selectedCharacterStat, setSelectedCharacterStat] = useState<{
     stat: string, 
@@ -41,7 +43,7 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
     descriptionStyle: 'serious' as 'serious' | 'ironic' | 'roleplay',
     uiTheme: 'classic-dark' as 'classic-dark' | 'cyberpunk' | 'paper-diary' | 'retro'
   });
-  const [currentProject, setCurrentProject] = useState<ProjectSettings | null>(null);
+  const [currentProject, setCurrentProject] = useState<ProjectSettings | null>(initialProject || null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showDemoQuest, setShowDemoQuest] = useState(false);
 
@@ -111,23 +113,23 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
 
   return (
     <>
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+    <div className="min-h-screen bg-[#36393F] text-white flex flex-col">
       {/* Top Header Bar */}
-      <div className="bg-gray-800 border-b border-gray-700 px-6 py-4 flex items-center justify-between">
+      <div className="bg-[#2F3136] border-b border-[#40444B] px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+            <div className="w-6 h-6 bg-[#5865F2] rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">N</span>
             </div>
             <span className="text-white font-medium">Nexus</span>
           </div>
           {currentProject ? (
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+              <div className="w-6 h-6 bg-[#3BA55C] rounded-full flex items-center justify-center">
                 <span className="text-white text-xs">📁</span>
               </div>
               <span className="text-white font-medium">{currentProject.name}</span>
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-[#B9BBBE]">
                 {currentProject.gameTone.mood} • {currentProject.gameTone.descriptionStyle}
               </span>
             </div>
@@ -136,7 +138,7 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
               <div className="w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center">
                 <span className="text-white text-xs">❓</span>
               </div>
-              <span className="text-gray-400 font-medium">Проект не выбран</span>
+              <span className="text-[#B9BBBE] font-medium">Проект не выбран</span>
             </div>
           )}
         </div>
@@ -145,7 +147,7 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
           {onNavigateToLanding && (
             <button
               onClick={onNavigateToLanding}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#4F545C] hover:bg-[#5D6269] transition-colors"
             >
               <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
                 <span className="text-white text-xs">←</span>
@@ -158,20 +160,20 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
 
       <div className="flex flex-1">
         {/* Left Sidebar */}
-        <div className="w-64 bg-gray-800 border-r border-gray-700 p-4">
+        <div className="w-64 bg-[#2F3136] border-r border-[#40444B] p-4">
           <nav className="space-y-2">
             <button
               onClick={() => setActiveSection('characters')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                 activeSection === 'characters' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                  ? 'bg-[#5865F2] text-white' 
+                  : 'text-[#B9BBBE] hover:bg-[#4F545C] hover:text-white'
               }`}
             >
               <span className="text-xl">🎮</span>
               <span className="font-medium">Персонаж</span>
               {characters.length > 0 && (
-                <span className="ml-auto text-xs bg-green-500 text-white px-2 py-1 rounded-full">
+                <span className="ml-auto text-xs bg-[#3BA55C] text-white px-2 py-1 rounded-full">
                   ✓
                 </span>
               )}
@@ -181,8 +183,8 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
               onClick={() => setActiveSection('events')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                 activeSection === 'events' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                  ? 'bg-[#5865F2] text-white' 
+                  : 'text-[#B9BBBE] hover:bg-[#4F545C] hover:text-white'
               }`}
             >
               <span className="text-xl">👥</span>
@@ -193,8 +195,8 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
               onClick={() => setActiveSection('branches')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                 activeSection === 'branches' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                  ? 'bg-[#5865F2] text-white' 
+                  : 'text-[#B9BBBE] hover:bg-[#4F545C] hover:text-white'
               }`}
             >
               <span className="text-xl">📜</span>
@@ -205,12 +207,24 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
               onClick={() => setActiveSection('projects')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                 activeSection === 'projects' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                  ? 'bg-[#5865F2] text-white' 
+                  : 'text-[#B9BBBE] hover:bg-[#4F545C] hover:text-white'
               }`}
             >
               <span className="text-xl">📋</span>
               <span className="font-medium">Проекты</span>
+            </button>
+            
+            <button
+              onClick={() => setActiveSection('chat')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                activeSection === 'chat' 
+                  ? 'bg-[#5865F2] text-white' 
+                  : 'text-[#B9BBBE] hover:bg-[#4F545C] hover:text-white'
+              }`}
+            >
+              <span className="text-xl">🤖</span>
+              <span className="font-medium">ИИ-Чат</span>
             </button>
           </nav>
           
@@ -229,16 +243,16 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
                           </div>
                           <div className="flex-1">
                             <h4 className="text-white font-semibold">{characters[0].name || 'Безымянный'}</h4>
-                            <p className="text-gray-400 text-xs">Главный герой новеллы</p>
+                            <p className="text-[#B9BBBE] text-xs">Главный герой новеллы</p>
                           </div>
                         </div>
                         <div className="space-y-2">
                           <div className="flex justify-between text-xs">
-                            <span className="text-gray-400">Уровень:</span>
+                            <span className="text-[#B9BBBE]">Уровень:</span>
                             <span className="text-white">{characters[0].level || 1}</span>
                           </div>
                           <div className="flex justify-between text-xs">
-                            <span className="text-gray-400">Очки характеристик:</span>
+                            <span className="text-[#B9BBBE]">Очки характеристик:</span>
                             <span className="text-white">{characters[0].stats ? Object.values(characters[0].stats).reduce((sum, stat) => sum + stat.value, 0) : 0}</span>
                           </div>
                         </div>
@@ -252,7 +266,9 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
                           <button
                             onClick={() => {
                               console.log('🎭 Opening demo quest...');
+                              console.log('Current showDemoQuest state:', showDemoQuest);
                               setShowDemoQuest(true);
+                              console.log('Set showDemoQuest to true');
                             }}
                             className="w-full text-xs bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-3 py-2 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                           >
@@ -269,7 +285,7 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
                   <div className="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center mx-auto mb-3">
                     <span className="text-2xl">🎮</span>
                   </div>
-                  <p className="text-xs text-gray-400 mb-3">Геймплейный персонаж не создан</p>
+                  <p className="text-xs text-[#B9BBBE] mb-3">Геймплейный персонаж не создан</p>
           <button
                     onClick={() => handleActionClick('create-character')}
                     className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-colors"
@@ -280,6 +296,18 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
               )}
             </div>
           )}
+          
+          {/* Chat Section */}
+          {activeSection === 'chat' && (
+            <div className="mt-4 h-96">
+              <ChatAgent 
+                currentProject={currentProject} 
+                onProjectRequired={() => {
+                  setSelectedAction('manage-projects');
+                }}
+              />
+            </div>
+          )}
         </div>
 
       {/* Main Content Area */}
@@ -288,76 +316,76 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
             {/* Top Action Buttons Row */}
             <div className="mb-12">
               <div className="flex items-center justify-center gap-2 mb-8">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-[#5865F2] rounded-full"></div>
                 <p className="text-gray-300 text-lg">Начните с одного из следующих действий:</p>
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-[#5865F2] rounded-full"></div>
               </div>
               
               {/* Horizontal Action Buttons */}
               <div className="flex flex-wrap justify-center gap-4 max-w-5xl mx-auto">
               <button
                 onClick={() => handleActionClick('create-character')}
-                className="action-button group bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-xl transition-all duration-200 text-center border border-gray-600 hover:border-gray-500 hover:shadow-lg hover:-translate-y-1 relative min-w-[200px]"
+                className="action-button group bg-[#2F3136] hover:bg-[#36393F] text-white p-4 rounded-xl transition-all duration-200 text-center border border-[#40444B] hover:border-[#5865F2] hover:shadow-lg hover:-translate-y-1 relative min-w-[200px]"
               >
                 <div className="flex flex-col items-center gap-3">
-                  <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-500 transition-colors shadow-lg">
+                  <div className="w-14 h-14 bg-[#5865F2] rounded-xl flex items-center justify-center group-hover:bg-[#4752C4] transition-colors shadow-lg">
                     <span className="text-2xl">🎮</span>
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold mb-1">Геймплейный персонаж</h3>
-                    <p className="text-gray-400 text-xs leading-tight">Создать главного героя новеллы</p>
+                    <p className="text-[#B9BBBE] text-xs leading-tight">Создать главного героя новеллы</p>
                   </div>
                 </div>
               </button>
 
               <button
                 onClick={() => handleActionClick('create-event')}
-                className="action-button group bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-xl transition-all duration-200 text-center border border-gray-600 hover:border-gray-500 hover:shadow-lg hover:-translate-y-1 relative min-w-[200px]"
+                className="action-button group bg-[#2F3136] hover:bg-[#36393F] text-white p-4 rounded-xl transition-all duration-200 text-center border border-[#40444B] hover:border-[#5865F2] hover:shadow-lg hover:-translate-y-1 relative min-w-[200px]"
               >
                 <div className="flex flex-col items-center gap-3">
-                  <div className="w-14 h-14 bg-green-600 rounded-xl flex items-center justify-center group-hover:bg-green-500 transition-colors shadow-lg">
+                  <div className="w-14 h-14 bg-[#3BA55C] rounded-xl flex items-center justify-center group-hover:bg-[#2D7D46] transition-colors shadow-lg">
                     <span className="text-2xl">⚡</span>
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold mb-1">Создать событие</h3>
-                    <p className="text-gray-400 text-xs leading-tight">Отдельные события в игре</p>
+                    <p className="text-[#B9BBBE] text-xs leading-tight">Отдельные события в игре</p>
                   </div>
                 </div>
               </button>
 
               <button
                 onClick={() => handleActionClick('event-branch')}
-                className="action-button group bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-xl transition-all duration-200 text-center border border-gray-600 hover:border-gray-500 hover:shadow-lg hover:-translate-y-1 relative min-w-[200px]"
+                className="action-button group bg-[#2F3136] hover:bg-[#36393F] text-white p-4 rounded-xl transition-all duration-200 text-center border border-[#40444B] hover:border-[#5865F2] hover:shadow-lg hover:-translate-y-1 relative min-w-[200px]"
               >
                 <div className="flex flex-col items-center gap-3">
-                  <div className="w-14 h-14 bg-yellow-600 rounded-xl flex items-center justify-center group-hover:bg-yellow-500 transition-colors shadow-lg">
+                  <div className="w-14 h-14 bg-[#FAA61A] rounded-xl flex items-center justify-center group-hover:bg-[#DAA520] transition-colors shadow-lg">
                     <span className="text-2xl">📜</span>
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold mb-1">Квесты</h3>
-                    <p className="text-gray-400 text-xs leading-tight">Создать квестовые ветки</p>
+                    <p className="text-[#B9BBBE] text-xs leading-tight">Создать квестовые ветки</p>
                   </div>
                 </div>
               </button>
 
               <button
                 onClick={() => handleActionClick('open-project')}
-                className="action-button group bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-xl transition-all duration-200 text-center border border-gray-600 hover:border-gray-500 hover:shadow-lg hover:-translate-y-1 relative min-w-[200px]"
+                className="action-button group bg-[#2F3136] hover:bg-[#36393F] text-white p-4 rounded-xl transition-all duration-200 text-center border border-[#40444B] hover:border-[#5865F2] hover:shadow-lg hover:-translate-y-1 relative min-w-[200px]"
               >
                 <div className="flex flex-col items-center gap-3">
-                  <div className="w-14 h-14 bg-indigo-600 rounded-xl flex items-center justify-center group-hover:bg-indigo-500 transition-colors shadow-lg">
+                  <div className="w-14 h-14 bg-[#5865F2] rounded-xl flex items-center justify-center group-hover:bg-[#4752C4] transition-colors shadow-lg">
                     <span className="text-2xl">📁</span>
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold mb-1">Открыть проект</h3>
-                    <p className="text-gray-400 text-xs leading-tight">Существующие проекты</p>
+                    <p className="text-[#B9BBBE] text-xs leading-tight">Существующие проекты</p>
                   </div>
                 </div>
               </button>
 
               <button
                 onClick={() => handleActionClick('game-setting')}
-                className="action-button group bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-xl transition-all duration-200 text-center border border-gray-600 hover:border-gray-500 hover:shadow-lg hover:-translate-y-1 relative min-w-[200px]"
+                className="action-button group bg-[#2F3136] hover:bg-[#36393F] text-white p-4 rounded-xl transition-all duration-200 text-center border border-[#40444B] hover:border-[#5865F2] hover:shadow-lg hover:-translate-y-1 relative min-w-[200px]"
               >
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center group-hover:bg-purple-500 transition-colors shadow-lg">
@@ -365,14 +393,14 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold mb-1">Сеттинг</h3>
-                    <p className="text-gray-400 text-xs leading-tight">Настройки игры</p>
+                    <p className="text-[#B9BBBE] text-xs leading-tight">Настройки игры</p>
                   </div>
                 </div>
               </button>
 
               <button
                 onClick={() => handleActionClick('game-tone')}
-                className="action-button group bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-xl transition-all duration-200 text-center border border-gray-600 hover:border-gray-500 hover:shadow-lg hover:-translate-y-1 relative min-w-[200px]"
+                className="action-button group bg-[#2F3136] hover:bg-[#36393F] text-white p-4 rounded-xl transition-all duration-200 text-center border border-[#40444B] hover:border-[#5865F2] hover:shadow-lg hover:-translate-y-1 relative min-w-[200px]"
               >
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-14 h-14 bg-gradient-to-br from-pink-600 to-purple-600 rounded-xl flex items-center justify-center group-hover:from-pink-500 group-hover:to-purple-500 transition-all duration-200 shadow-lg">
@@ -380,14 +408,14 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold mb-1">Тональность игры</h3>
-                    <p className="text-gray-400 text-xs leading-tight">Стиль и атмосфера</p>
+                    <p className="text-[#B9BBBE] text-xs leading-tight">Стиль и атмосфера</p>
                   </div>
                 </div>
               </button>
 
               <button
                 onClick={() => handleActionClick('manage-projects')}
-                className="action-button group bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-xl transition-all duration-200 text-center border border-gray-600 hover:border-gray-500 hover:shadow-lg hover:-translate-y-1 relative min-w-[200px]"
+                className="action-button group bg-[#2F3136] hover:bg-[#36393F] text-white p-4 rounded-xl transition-all duration-200 text-center border border-[#40444B] hover:border-[#5865F2] hover:shadow-lg hover:-translate-y-1 relative min-w-[200px]"
               >
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-14 h-14 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center group-hover:from-orange-500 group-hover:to-red-500 transition-all duration-200 shadow-lg">
@@ -395,7 +423,7 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
                   </div>
             <div>
                     <h3 className="text-lg font-semibold mb-1">Управление проектами</h3>
-                    <p className="text-gray-400 text-xs leading-tight">Создание и настройка</p>
+                    <p className="text-[#B9BBBE] text-xs leading-tight">Создание и настройка</p>
                   </div>
                 </div>
               </button>
@@ -405,7 +433,7 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
             {/* Welcome Section */}
             <div className="text-center mt-16">
               <h1 className="text-5xl font-bold text-white mb-4">Добро пожаловать в Nexus!</h1>
-              <p className="text-gray-400 text-lg">Инструмент для создания интерактивных новелл</p>
+              <p className="text-[#B9BBBE] text-lg">Инструмент для создания интерактивных новелл</p>
               <div className="mt-6 text-sm text-gray-500">
                 <p>Создайте геймплейного персонажа, разработайте квесты и события</p>
               </div>
@@ -483,7 +511,7 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
                         </h2>
                 <button
                           onClick={handleClosePanel}
-                          className="text-gray-400 hover:text-white text-xl"
+                          className="text-[#B9BBBE] hover:text-white text-xl"
                         >
                           ✕
                 </button>
@@ -520,7 +548,7 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-white font-semibold truncate">{selectedCharacterStat?.stat || 'Справочник'}</h3>
-                  <p className="text-gray-400 text-xs">Характеристика персонажа</p>
+                  <p className="text-[#B9BBBE] text-xs">Характеристика персонажа</p>
                 </div>
               </div>
               <button
@@ -658,7 +686,7 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
                                 <div className="skill-tooltip absolute bottom-full left-0 mb-2 w-64 bg-gray-900/95 border border-gray-600 rounded-lg p-3 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                                   <div className="text-xs text-gray-300">
                                     <div className="font-semibold text-white mb-1">{skill}</div>
-                                    <div className="text-gray-400">
+                                    <div className="text-[#B9BBBE]">
                                       {/* Логика */}
                                       {selectedCharacterStat.stat === 'Логика' && skill === 'дедукция' && 'Позволяет делать логические выводы из имеющихся фактов и улик. Помогает связать разрозненные детали в единую картину.'}
                                       {selectedCharacterStat.stat === 'Логика' && skill === 'логический анализ' && 'Систематический анализ информации для выявления закономерностей и скрытых связей.'}
@@ -736,7 +764,7 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
                           
                           {/* Character stat bonus info */}
                           <div className="mt-4 pt-3 border-t border-gray-600">
-                            <div className="text-xs text-gray-400">
+                            <div className="text-xs text-[#B9BBBE]">
                               <div className="flex items-center gap-2 mb-1">
                                 <span className="text-yellow-400">💡</span>
                                 <span className="font-medium">Бонус характеристики:</span>
@@ -755,7 +783,7 @@ export default function AdventureLayout({ children: _, onNavigateToLanding }: Ad
                 <div className="text-center py-8">
                   <div className="text-4xl mb-3">🎯</div>
                   <h4 className="text-white font-semibold mb-2">Добро пожаловать!</h4>
-                  <p className="text-gray-400 text-sm leading-relaxed">
+                  <p className="text-[#B9BBBE] text-sm leading-relaxed">
                     Выберите характеристику в создании персонажа, чтобы узнать подробную информацию о ней.
                   </p>
               </div>

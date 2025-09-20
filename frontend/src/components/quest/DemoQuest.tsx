@@ -15,6 +15,8 @@ interface QuestChoice {
 }
 
 export default function DemoQuest({ character, onClose }: DemoQuestProps) {
+  console.log('🎭 DemoQuest component created with character:', character);
+  
   const [currentStep, setCurrentStep] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [questSteps, setQuestSteps] = useState<AIStep[]>([]);
@@ -138,8 +140,30 @@ export default function DemoQuest({ character, onClose }: DemoQuestProps) {
   });
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-gray-800 rounded-xl border border-gray-600 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-red-500 bg-opacity-90 flex items-center justify-center z-[9999] p-4"
+      style={{ 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 9999,
+        backgroundColor: 'rgba(255, 0, 0, 0.9)'
+      }}
+    >
+      <div 
+        className="bg-yellow-500 rounded-xl border-4 border-red-500 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+        style={{
+          backgroundColor: 'yellow',
+          minHeight: '400px',
+          border: '4px solid red'
+        }}
+      >
+        {/* Debug Header */}
+        <div className="bg-red-600 text-white p-4 text-center font-bold text-xl">
+          🚨 DEBUG MODE - ДЕМО КВЕСТ ВИДЕН! 🚨
+        </div>
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4 rounded-t-xl border-b border-gray-600">
           <div className="flex items-center justify-between">

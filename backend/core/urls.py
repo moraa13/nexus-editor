@@ -16,6 +16,7 @@ from .views import (
     generate_quest, generate_quest_step, cors_test,
 )
 from .auth_views import login, register, logout, user_profile
+from .chat_views import generate_chat_response
 
 router = DefaultRouter()
 router.register("projects", ProjectViewSet, basename="project")
@@ -77,6 +78,7 @@ urlpatterns = [
     
     # CORS test endpoint
     path("cors-test/", cors_test),
+    path("chat/generate/", generate_chat_response),
 ]
 urlpatterns += router.urls
 
