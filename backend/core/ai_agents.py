@@ -63,6 +63,9 @@ class AIAgent:
             }
         except Exception as e:
             print(f"AI Agent {self.agent_type.value} error: {e}")
+            print(f"API Key present: {bool(self.api_key)}")
+            print(f"Base URL: {self.base_url}")
+            print(f"Model: {self.model}")
             return self._get_fallback_response(user_message)
     
     def _build_user_message(self, user_message: str, context: Dict[str, Any]) -> str:
@@ -120,12 +123,14 @@ class AIAgent:
             result = response.json()
             return result['choices'][0]['message']['content']
         else:
+            print(f"OpenRouter API error: {response.status_code}")
+            print(f"Response text: {response.text}")
             raise Exception(f"OpenRouter API error: {response.status_code} - {response.text}")
     
     def _get_fallback_response(self, user_message: str) -> Dict[str, Any]:
         """Fallback ответ когда API недоступен"""
         return {
-            'message': f"Извините, {self.agent_type.value} агент временно недоступен. Ваше сообщение: '{user_message}'",
+            'message': f"🤖 {self.agent_type.value} агент: Привет! Я готов помочь с созданием игры. К сожалению, сейчас у меня проблемы с подключением к ИИ-сервису. Попробуйте обновить API ключ OpenRouter в настройках.",
             'agent_type': self.agent_type.value,
             'success': False,
             'model': 'fallback'
