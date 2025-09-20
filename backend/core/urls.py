@@ -17,6 +17,7 @@ from .views import (
 )
 from .auth_views import login, register, logout, user_profile
 from .chat_views import generate_chat_response
+from .ai_views import ChatSessionViewSet, AIConfigViewSet, ai_chat, generate_content, ai_status
 
 router = DefaultRouter()
 router.register("projects", ProjectViewSet, basename="project")
@@ -38,6 +39,8 @@ router.register("quest-characters", QuestCharacterViewSet, basename="questcharac
 router.register("dialogue-logs", DialogueLogViewSet, basename="dialoguelog")
 router.register("export-sessions", ExportSessionViewSet, basename="exportsession")
 router.register("export-templates", ExportTemplateViewSet, basename="exporttemplate")
+router.register("chat-sessions", ChatSessionViewSet, basename="chatsession")
+router.register("ai-configs", AIConfigViewSet, basename="aiconfig")
 
 urlpatterns = [
     # Authentication endpoints
@@ -79,6 +82,11 @@ urlpatterns = [
     # CORS test endpoint
     path("cors-test/", cors_test),
     path("chat/generate/", generate_chat_response),
+    
+    # AI Chat endpoints
+    path("ai/chat/", ai_chat),
+    path("ai/generate-content/", generate_content),
+    path("ai/status/", ai_status),
 ]
 urlpatterns += router.urls
 

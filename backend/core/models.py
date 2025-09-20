@@ -807,3 +807,77 @@ class ExportTemplate(BaseModel):
     
     def __str__(self) -> str:
         return f"{self.name} ({self.format_type})"
+
+
+# AI Chat System Models
+
+class ChatSession(BaseModel):
+    """Сессия чата с ИИ"""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        related_name="chat_sessions"
+    )
+    project = models.ForeignKey(
+        GameProject,
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        related_name="chat_sessions"
+    )
+    session_name = models.CharField(max_length=200, blank=True)
+    context = models.JSONField(default=dict, blank=True, help_text="Контекст проекта (жанр, тональность, персонажи)")
+    is_active = models.BooleanField(default=True)
+    
+    def __str__(self) -> str:
+        return f"Chat Session {self.id} - {self.session_name or 'Unnamed'}"
+    
+    @property
+    def message_count(self) -> int:
+        return self.messages.count()
+    
+    def get_recent_messages(self, limit: int = 10) -> list:
+        """Получить последние сообщения для контекста"""
+        return list(self.messages.order_by('-created_at')[:limit].values('role', 'content', 'created_at'))
+
+
+class ChatMessage(BaseModel):
+    """Сообщение в чате с ИИ"""
+    ROLE_CHOICES = [
+        ('user', 'Пользователь'),
+        ('assistant', 'ИИ-помощник'),
+        ('system', 'Система'),
+    ]
+    
+    session = models.ForeignKey(
+        ChatSession,
+        on_delete=models.CASCADE,
+        related_name="messages"
+    )
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    content = models.TextField()
+    metadata = models.JSONField(default=dict, blank=True, help_text="Метаданные (модель, токены, время ответа)")
+    is_ai_generated = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['created_at']
+    
+    def __str__(self) -> str:
+        return f"{self.role}: {self.content[:50]}"
+
+
+class AIConfig(BaseModel):
+    """Конфигурация ИИ для проектов"""
+    project = models.OneToOneField(
+        GameProject,
+        on_delete=models.CASCADE,
+        related_name="ai_config"
+    )
+    model = models.CharField(max_length=100, default='anthropic/claude-3.5-sonnet')
+    temperature = models.FloatField(default=0.7, validators=[MinValueValidator(0.0), MaxValueValidator(2.0)])
+    max_tokens = models.IntegerField(default=1000, validators=[MinValueValidator(1), MaxValueValidator(4000)])
+    system_prompt = models.TextField(blank=True, help_text="Кастомный системный промпт")
+    is_enabled = models.BooleanField(default=True)
+    
+    def __str__(self) -> str:
+        return f"AI Config for {self.project.name}"

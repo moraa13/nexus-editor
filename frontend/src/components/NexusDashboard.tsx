@@ -63,8 +63,42 @@ export default function NexusDashboard({ onNavigateToEditor, currentProject }: N
 
   const handleSendMessage = async () => {
     if (!chatMessage.trim()) return;
-    setAiResponse(`"${chatMessage}"... любопытно. Давай подумаем, как это встроить в повествование.`);
+    
+    const message = chatMessage;
     setChatMessage('');
+    
+    // Показываем индикатор загрузки
+    setAiResponse('🤔 Думаю над ответом...');
+    
+    try {
+      const response = await fetch('/api/ai/chat/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: message,
+          context: {
+            genre: currentProject?.gameSetting?.genre || 'noir',
+            tone: currentProject?.gameTone?.mood || 'dark-noir',
+            project_name: currentProject?.name || 'Новый проект',
+            setting: 'Современный город'
+          },
+          save_to_history: true
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setAiResponse(data.message || 'Извините, произошла ошибка при генерации ответа.');
+      
+    } catch (error) {
+      console.error('AI Chat error:', error);
+      setAiResponse('Извините, не могу подключиться к ИИ-помощнику. Попробуйте позже.');
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

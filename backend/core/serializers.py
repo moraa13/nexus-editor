@@ -2,7 +2,8 @@ from rest_framework import serializers
 from .models import (
     Project, UserProfile, GameProject, DialogueNode, DialogueLink, CharacterStat, 
     Character, NPC, Dialogue, Post, SkillCheck, DialogueOption, RollResult,
-    Quest, QuestObjective, QuestCharacter, DialogueLog, ExportSession, ExportTemplate
+    Quest, QuestObjective, QuestCharacter, DialogueLog, ExportSession, ExportTemplate,
+    ChatSession, ChatMessage, AIConfig
 )
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -274,3 +275,91 @@ class ExportTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExportTemplate
         fields = "__all__"
+
+
+# AI Chat System Serializers
+
+class ChatMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChatMessage
+        fields = ['id', 'role', 'content', 'metadata', 'is_ai_generated', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+
+class ChatSessionSerializer(serializers.ModelSerializer):
+    messages = ChatMessageSerializer(many=True, read_only=True)
+    message_count = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = ChatSession
+        fields = ['id', 'session_name', 'context', 'is_active', 'message_count', 'messages', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class ChatSessionListSerializer(serializers.ModelSerializer):
+    message_count = serializers.ReadOnlyField()
+    last_message = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ChatSession
+        fields = ['id', 'session_name', 'context', 'is_active', 'message_count', 'last_message', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
+    
+    def get_last_message(self, obj):
+        last_msg = obj.messages.last()
+        if last_msg:
+            return {
+                'content': last_msg.content[:100] + '...' if len(last_msg.content) > 100 else last_msg.content,
+                'role': last_msg.role,
+                'created_at': last_msg.created_at
+            }
+        return None
+
+
+class AIConfigSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AIConfig
+        fields = ['id', 'model', 'temperature', 'max_tokens', 'system_prompt', 'is_enabled', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class ChatRequestSerializer(serializers.Serializer):
+    """Сериализатор для запросов к AI чату"""
+    message = serializers.CharField(max_length=2000, help_text="Сообщение пользователя")
+    session_id = serializers.UUIDField(required=False, help_text="ID сессии чата")
+    project_id = serializers.UUIDField(required=False, help_text="ID проекта")
+    context = serializers.JSONField(required=False, default=dict, help_text="Контекст проекта")
+    save_to_history = serializers.BooleanField(default=True, help_text="Сохранять ли в историю")
+
+
+class ChatResponseSerializer(serializers.Serializer):
+    """Сериализатор для ответов AI чата"""
+    message = serializers.CharField(help_text="Ответ ИИ")
+    session_id = serializers.UUIDField(help_text="ID сессии чата")
+    message_id = serializers.UUIDField(help_text="ID сообщения")
+    success = serializers.BooleanField(help_text="Успешность запроса")
+    model = serializers.CharField(help_text="Использованная модель")
+    tokens_used = serializers.IntegerField(help_text="Количество использованных токенов")
+    fallback = serializers.BooleanField(default=False, help_text="Использован ли fallback ответ")
+    created_at = serializers.DateTimeField(help_text="Время создания ответа")
+
+
+class ContentGenerationRequestSerializer(serializers.Serializer):
+    """Сериализатор для генерации контента"""
+    content_type = serializers.ChoiceField(
+        choices=['dialogue', 'character', 'quest', 'scene'],
+        help_text="Тип генерируемого контента"
+    )
+    prompt = serializers.CharField(max_length=1000, help_text="Промпт для генерации")
+    project_id = serializers.UUIDField(required=False, help_text="ID проекта")
+    context = serializers.JSONField(required=False, default=dict, help_text="Контекст проекта")
+
+
+class ContentGenerationResponseSerializer(serializers.Serializer):
+    """Сериализатор для ответов генерации контента"""
+    content = serializers.JSONField(help_text="Сгенерированный контент")
+    content_type = serializers.CharField(help_text="Тип контента")
+    success = serializers.BooleanField(help_text="Успешность генерации")
+    model = serializers.CharField(help_text="Использованная модель")
+    tokens_used = serializers.IntegerField(help_text="Количество использованных токенов")
+    fallback = serializers.BooleanField(default=False, help_text="Использован ли fallback ответ")
