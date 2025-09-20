@@ -144,6 +144,12 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5181",
     "http://localhost:5182",  # Current Vite port
     "http://127.0.0.1:5182",
+    "http://localhost:5183",  # Current Vite port
+    "http://127.0.0.1:5183",
+    "http://localhost:5184",  # Current Vite port
+    "http://127.0.0.1:5184",
+    "http://localhost:5185",  # Current Vite port
+    "http://127.0.0.1:5185",
 ]
 CORS_ALLOW_HEADERS = [
     "accept",

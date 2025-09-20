@@ -36,11 +36,11 @@ export default function Editor() {
         return <DialogueNodeEditor dialogueId={selectedDialogueId} />;
       default:
         return (
-          <div className="h-full flex flex-col space-y-4">
-            <div className="flex-1 min-h-0">
+          <div className="h-full flex flex-col p-6 space-y-6">
+            <div className="flex-1 min-h-0 bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-600/30 overflow-hidden shadow-lg">
               <Canvas dialogueId={selectedDialogueId} characterId={selectedCharacterId} />
             </div>
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden">
+            <div className="bg-gray-800/60 backdrop-blur-sm border border-gray-600/50 rounded-2xl overflow-hidden shadow-lg">
               <DialogueGenerator />
             </div>
           </div>
@@ -54,93 +54,93 @@ export default function Editor() {
       main={
         <div className="h-full flex flex-col">
           {/* Tab Navigation */}
-          <div className="flex items-center gap-1 p-2 bg-white/5 backdrop-blur-sm border-b border-white/10">
+          <div className="flex items-center gap-2 p-4 bg-gray-800/60 backdrop-blur-sm border-b border-gray-600/30">
             <button
               onClick={() => setActiveTab("canvas")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${
                 activeTab === "canvas"
-                  ? "bg-indigo-600 text-white"
-                  : "text-gray-400 hover:text-white hover:bg-white/10"
+                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
+                  : "text-gray-400 hover:text-white hover:bg-gray-700/50"
               }`}
             >
-              <span className="mr-2">🎯</span>
+              <span className="text-lg">🎯</span>
               Canvas
             </button>
             <button
               onClick={() => setActiveTab("skill-checks")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${
                 activeTab === "skill-checks"
-                  ? "bg-purple-600 text-white"
-                  : "text-gray-400 hover:text-white hover:bg-white/10"
+                  ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
+                  : "text-gray-400 hover:text-white hover:bg-gray-700/50"
               }`}
             >
-              <span className="mr-2">🎲</span>
+              <span className="text-lg">🎲</span>
               Skill Checks
             </button>
             <button
               onClick={() => setActiveTab("dice-roller")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${
                 activeTab === "dice-roller"
-                  ? "bg-yellow-600 text-white"
-                  : "text-gray-400 hover:text-white hover:bg-white/10"
+                  ? "bg-gradient-to-r from-yellow-600 to-orange-600 text-white shadow-lg"
+                  : "text-gray-400 hover:text-white hover:bg-gray-700/50"
               }`}
             >
-              <span className="mr-2">🎲</span>
+              <span className="text-lg">🎲</span>
               Dice Roller
             </button>
             <button
               onClick={() => setActiveTab("characters")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${
                 activeTab === "characters"
-                  ? "bg-emerald-600 text-white"
-                  : "text-gray-400 hover:text-white hover:bg-white/10"
+                  ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg"
+                  : "text-gray-400 hover:text-white hover:bg-gray-700/50"
               }`}
             >
-              <span className="mr-2">👥</span>
+              <span className="text-lg">👥</span>
               Characters
             </button>
             <button
               onClick={() => setActiveTab("quests")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${
                 activeTab === "quests"
-                  ? "bg-purple-600 text-white"
-                  : "text-gray-400 hover:text-white hover:bg-white/10"
+                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg"
+                  : "text-gray-400 hover:text-white hover:bg-gray-700/50"
               }`}
             >
-              <span className="mr-2">🎯</span>
+              <span className="text-lg">🎯</span>
               Quests
             </button>
             <button
               onClick={() => setActiveTab("dialogue-log")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${
                 activeTab === "dialogue-log"
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-400 hover:text-white hover:bg-white/10"
+                  ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg"
+                  : "text-gray-400 hover:text-white hover:bg-gray-700/50"
               }`}
             >
-              <span className="mr-2">📑</span>
+              <span className="text-lg">📑</span>
               Dialogue Log
             </button>
             <button
               onClick={() => setActiveTab("dialogue-nodes")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${
                 activeTab === "dialogue-nodes"
-                  ? "bg-green-600 text-white"
-                  : "text-gray-400 hover:text-white hover:bg-white/10"
+                  ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg"
+                  : "text-gray-400 hover:text-white hover:bg-gray-700/50"
               }`}
             >
-              <span className="mr-2">🌿</span>
+              <span className="text-lg">🌿</span>
               Dialogue Nodes
             </button>
             <button
               onClick={() => setActiveTab("export")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${
                 activeTab === "export"
-                  ? "bg-orange-600 text-white"
-                  : "text-gray-400 hover:text-white hover:bg-white/10"
+                  ? "bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg"
+                  : "text-gray-400 hover:text-white hover:bg-gray-700/50"
               }`}
             >
-              <span className="mr-2">📤</span>
+              <span className="text-lg">📤</span>
               Export
             </button>
           </div>

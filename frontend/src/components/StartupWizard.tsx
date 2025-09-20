@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import Button from './ui/Button';
 import Input from './ui/Input';
-import Card from './ui/Card';
 
 interface StartupWizardProps {
   onComplete: (projectData: ProjectData) => void;
@@ -68,60 +66,82 @@ export default function StartupWizard({ onComplete }: StartupWizardProps) {
     switch (step) {
       case 1:
         return (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-white mb-4">Создание нового проекта</h2>
-              <p className="text-[#B9BBBE] text-lg">
+              <h2 className="text-xl font-bold text-white mb-3">Создание нового проекта</h2>
+              <p className="text-[#B9BBBE] text-sm">
                 Выберите способ создания вашей интерактивной новеллы
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card 
-                variant="elevated" 
-                className={`text-center cursor-pointer transition-all duration-200 ${
-                  creationMode === 'wizard' ? 'ring-2 ring-[#5865F2] bg-[#2F3136]' : 'hover:bg-[#2F3136]'
-                }`}
-                onClick={() => setCreationMode('wizard')}
-              >
-                <div className="space-y-4">
-                  <div className="w-16 h-16 bg-[#5865F2] rounded-full flex items-center justify-center mx-auto">
-                    <span className="text-2xl">⚡</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div 
+                    className={`text-center cursor-pointer transition-all duration-300 p-5 rounded-xl border-2 transform hover:scale-105 ${
+                      creationMode === 'wizard' 
+                        ? 'border-[#5865F2] bg-gradient-to-br from-[#5865F2]/20 to-blue-600/20 shadow-lg shadow-[#5865F2]/25' 
+                        : 'border-gray-600 bg-gray-800/50 hover:border-[#5865F2] hover:bg-gradient-to-br hover:from-[#5865F2]/10 hover:to-blue-600/10 hover:shadow-lg hover:shadow-[#5865F2]/15'
+                    }`}
+                    onClick={() => setCreationMode('wizard')}
+                  >
+                    <div className="space-y-3">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto transition-all duration-300 ${
+                        creationMode === 'wizard' 
+                          ? 'bg-gradient-to-br from-[#5865F2] to-blue-600 shadow-lg' 
+                          : 'bg-[#5865F2]'
+                      }`}>
+                        <span className="text-xl">⚡</span>
+                      </div>
+                      <h3 className="text-lg font-bold text-white">Пошаговый мастер</h3>
+                      <p className="text-[#B9BBBE] text-sm leading-relaxed">
+                        5 простых шагов для создания проекта
+                      </p>
+                      {creationMode === 'wizard' && (
+                        <div className="flex items-center justify-center gap-1 text-[#5865F2] text-sm font-medium">
+                          <span>✓</span>
+                          <span>Выбрано</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-white">Пошаговый мастер</h3>
-                  <p className="text-[#B9BBBE] text-sm">
-                    5 простых шагов для создания проекта
-                  </p>
-                </div>
-              </Card>
 
-              <Card 
-                variant="elevated" 
-                className={`text-center cursor-pointer transition-all duration-200 ${
-                  creationMode === 'parser' ? 'ring-2 ring-[#5865F2] bg-[#2F3136]' : 'hover:bg-[#2F3136]'
-                }`}
-                onClick={() => setCreationMode('parser')}
-              >
-                <div className="space-y-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto">
-                    <span className="text-2xl">🤖</span>
+                  <div 
+                    className={`text-center cursor-pointer transition-all duration-300 p-5 rounded-xl border-2 transform hover:scale-105 ${
+                      creationMode === 'parser' 
+                        ? 'border-purple-500 bg-gradient-to-br from-purple-500/20 to-pink-500/20 shadow-lg shadow-purple-500/25' 
+                        : 'border-gray-600 bg-gray-800/50 hover:border-purple-500 hover:bg-gradient-to-br hover:from-purple-500/10 hover:to-pink-500/10 hover:shadow-lg hover:shadow-purple-500/15'
+                    }`}
+                    onClick={() => setCreationMode('parser')}
+                  >
+                    <div className="space-y-3">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto transition-all duration-300 ${
+                        creationMode === 'parser' 
+                          ? 'bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg' 
+                          : 'bg-gradient-to-br from-purple-500 to-pink-500'
+                      }`}>
+                        <span className="text-xl">🤖</span>
+                      </div>
+                      <h3 className="text-lg font-bold text-white">Автоматический режим</h3>
+                      <p className="text-[#B9BBBE] text-sm leading-relaxed">
+                        Опишите игру - система создаст проект автоматически
+                      </p>
+                      {creationMode === 'parser' && (
+                        <div className="flex items-center justify-center gap-1 text-purple-400 text-sm font-medium">
+                          <span>✓</span>
+                          <span>Выбрано</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-white">Автоматический режим</h3>
-                  <p className="text-[#B9BBBE] text-sm">
-                    Опишите игру - система создаст проект автоматически
-                  </p>
                 </div>
-              </Card>
-            </div>
           </div>
         );
 
       case 2:
         return (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-white mb-2">Название проекта</h2>
-              <p className="text-[#B9BBBE]">Дайте имя вашему миру</p>
+              <h2 className="text-xl font-bold text-white mb-2">Название проекта</h2>
+              <p className="text-[#B9BBBE] text-sm">Дайте имя вашему миру</p>
             </div>
             
             <Input
@@ -136,21 +156,21 @@ export default function StartupWizard({ onComplete }: StartupWizardProps) {
 
       case 3:
         return (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-white mb-2">Выберите жанр</h2>
-              <p className="text-[#B9BBBE]">Какой стиль истории вы хотите создать?</p>
+              <h2 className="text-xl font-bold text-white mb-2">Выберите жанр</h2>
+              <p className="text-[#B9BBBE] text-sm">Какой стиль истории вы хотите создать?</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-3">
               {GENRES.map((genre) => (
                 <button
                   key={genre.value}
                   onClick={() => updateProjectData('genre', genre.value)}
                   className={`p-4 rounded-lg border-2 transition-all duration-200 text-left ${
                     projectData.genre === genre.value
-                      ? 'border-[#5865F2] bg-[#5865F2]/10'
-                      : 'border-[#40444B] hover:border-[#5865F2]/50'
+                      ? 'border-[#5865F2] bg-[#5865F2]/20'
+                      : 'border-gray-600 bg-gray-800/50 hover:border-[#5865F2] hover:bg-[#5865F2]/10'
                   }`}
                 >
                   <h3 className="font-semibold text-white mb-1">{genre.label}</h3>
@@ -179,8 +199,7 @@ export default function StartupWizard({ onComplete }: StartupWizardProps) {
               />
               
               <div className="text-center">
-                <Button 
-                  variant="secondary" 
+                <button 
                   onClick={() => {
                     // Показываем мини-парсер для автозаполнения
                     const description = prompt("Опишите ваш мир в нескольких предложениях:");
@@ -189,10 +208,10 @@ export default function StartupWizard({ onComplete }: StartupWizardProps) {
                       updateProjectData('setting', description);
                     }
                   }}
-                  className="text-sm"
+                  className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200"
                 >
                   ✨ Автозаполнить
-                </Button>
+                </button>
               </div>
             </div>
           </div>
@@ -200,10 +219,10 @@ export default function StartupWizard({ onComplete }: StartupWizardProps) {
 
       case 5:
         return (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-white mb-2">Тональность</h2>
-              <p className="text-[#B9BBBE]">Какое настроение будет у истории?</p>
+              <h2 className="text-xl font-bold text-white mb-2">Тональность</h2>
+              <p className="text-[#B9BBBE] text-sm">Какое настроение будет у истории?</p>
             </div>
             
             <div className="space-y-3">
@@ -213,8 +232,8 @@ export default function StartupWizard({ onComplete }: StartupWizardProps) {
                   onClick={() => updateProjectData('tone', tone.value)}
                   className={`w-full p-4 rounded-lg border-2 transition-all duration-200 text-left ${
                     projectData.tone === tone.value
-                      ? 'border-[#5865F2] bg-[#5865F2]/10'
-                      : 'border-[#40444B] hover:border-[#5865F2]/50'
+                      ? 'border-[#5865F2] bg-[#5865F2]/20'
+                      : 'border-gray-600 bg-gray-800/50 hover:border-[#5865F2] hover:bg-[#5865F2]/10'
                   }`}
                 >
                   <h3 className="font-semibold text-white mb-1">{tone.label}</h3>
@@ -232,6 +251,7 @@ export default function StartupWizard({ onComplete }: StartupWizardProps) {
 
   const canProceed = () => {
     switch (step) {
+      case 1: return creationMode !== null;
       case 2: return projectData.name.trim().length > 0;
       case 3: return projectData.genre.length > 0;
       case 4: return projectData.setting.trim().length > 0;
@@ -243,17 +263,17 @@ export default function StartupWizard({ onComplete }: StartupWizardProps) {
   // Если выбран режим парсера, показываем простую форму
   if (creationMode === 'parser') {
     return (
-      <div className="min-h-screen bg-[#36393F] flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-white mb-4">Автоматическое создание проекта</h2>
-            <p className="text-[#B9BBBE] text-lg">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 flex items-center justify-center p-4">
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-white mb-3">Автоматическое создание проекта</h2>
+            <p className="text-[#B9BBBE]">
               Опишите вашу игру - система автоматически создаст проект
             </p>
           </div>
           
-          <Card variant="elevated" padding="lg">
-            <div className="space-y-6">
+          <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-xl p-4">
+            <div className="space-y-4">
               <div>
                 <label className="block text-white font-medium mb-2">
                   Описание игры
@@ -262,29 +282,29 @@ export default function StartupWizard({ onComplete }: StartupWizardProps) {
                   value={projectData.description}
                   onChange={(e) => updateProjectData('description', e.target.value)}
                   placeholder="Например: 'Это киберпанк-игра про детектива в неоновом городе. Главный герой - бывший полицейский, который расследует серию убийств, связанных с корпорациями...'"
-                  className="w-full h-32 p-4 bg-[#2F3136] border border-[#40444B] rounded-lg text-white placeholder-[#B9BBBE] focus:border-[#5865F2] focus:outline-none resize-none"
+                  className="w-full h-32 p-4 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-[#5865F2] focus:outline-none resize-none"
                 />
               </div>
               
               <div className="text-center">
-                <Button
-                  variant="primary"
+                <button
                   onClick={handleComplete}
                   disabled={!projectData.description.trim()}
+                  className="bg-gradient-to-r from-[#5865F2] to-purple-600 hover:from-[#4752C4] hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 disabled:cursor-not-allowed"
                 >
                   ✨ Создать проект
-                </Button>
+                </button>
               </div>
             </div>
-          </Card>
+          </div>
           
           <div className="text-center mt-6">
-            <Button
-              variant="ghost"
+            <button
               onClick={() => setCreationMode('wizard')}
+              className="text-[#B9BBBE] hover:text-white transition-colors duration-200"
             >
               ← Пошаговый режим
-            </Button>
+            </button>
           </div>
         </div>
       </div>
@@ -292,8 +312,8 @@ export default function StartupWizard({ onComplete }: StartupWizardProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#36393F] flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-4xl mx-auto">
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between text-sm text-[#B9BBBE] mb-2">
@@ -309,36 +329,36 @@ export default function StartupWizard({ onComplete }: StartupWizardProps) {
         </div>
 
         {/* Content */}
-        <Card variant="elevated" padding="lg">
+        <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-xl p-4">
           {renderStep()}
-        </Card>
+        </div>
 
         {/* Navigation */}
         <div className="flex justify-between mt-6">
-          <Button
-            variant="ghost"
+          <button
             onClick={handleBack}
             disabled={step === 1}
+            className="text-[#B9BBBE] hover:text-white disabled:text-gray-600 disabled:cursor-not-allowed transition-colors duration-200"
           >
-            Назад
-          </Button>
+            ← Назад
+          </button>
           
           {step < 5 ? (
-            <Button
-              variant="primary"
+            <button
               onClick={handleNext}
               disabled={!canProceed()}
+              className="bg-gradient-to-r from-[#5865F2] to-purple-600 hover:from-[#4752C4] hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 disabled:cursor-not-allowed"
             >
-              Далее
-            </Button>
+              Далее →
+            </button>
           ) : (
-            <Button
-              variant="success"
+            <button
               onClick={handleComplete}
               disabled={!canProceed()}
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-600 disabled:to-gray-700 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 disabled:cursor-not-allowed"
             >
-              Создать проект
-            </Button>
+              ✨ Создать проект
+            </button>
           )}
         </div>
       </div>

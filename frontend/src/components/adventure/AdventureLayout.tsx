@@ -6,10 +6,14 @@ import TonePanel from '../setting/TonePanel';
 import ProjectManager from '../project/ProjectManager';
 import DemoQuest from '../quest/DemoQuest';
 import ChatAgent from '../ChatAgent';
+import ProjectPanel from '../ProjectPanel';
+import NovelInterface from '../novel/NovelInterface';
 import type { DiscoElysiumCharacter, GameSetting } from '../../types/discoElysium';
 import type { ProjectSettings } from '../../types/project';
+import type { GameTheme } from '../../types/theme';
 import { AIService } from '../../services/aiService';
 import { ProjectManager as PM } from '../../types/project';
+import { GAME_THEMES } from '../../types/theme';
 
 interface AdventureLayoutProps {
   children?: React.ReactNode;
@@ -18,7 +22,7 @@ interface AdventureLayoutProps {
 }
 
 export default function AdventureLayout({ children: _, onNavigateToLanding, initialProject }: AdventureLayoutProps) {
-  const [activeSection, setActiveSection] = useState<'characters' | 'events' | 'branches' | 'projects' | 'chat'>('characters');
+  const [activeSection, setActiveSection] = useState<'characters' | 'events' | 'branches' | 'projects' | 'chat' | 'novel' | 'project-panel'>('characters');
   const [selectedAction, setSelectedAction] = useState<'create-character' | 'create-event' | 'event-branch' | 'open-project' | 'game-setting' | 'game-tone' | 'manage-projects' | null>(null);
   const [selectedCharacterStat, setSelectedCharacterStat] = useState<{
     stat: string, 
@@ -226,6 +230,30 @@ export default function AdventureLayout({ children: _, onNavigateToLanding, init
               <span className="text-xl">🤖</span>
               <span className="font-medium">ИИ-Чат</span>
             </button>
+            
+            <button
+              onClick={() => setActiveSection('project-panel')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                activeSection === 'project-panel' 
+                  ? 'bg-[#5865F2] text-white' 
+                  : 'text-[#B9BBBE] hover:bg-[#4F545C] hover:text-white'
+              }`}
+            >
+              <span className="text-xl">📁</span>
+              <span className="font-medium">Панель проекта</span>
+            </button>
+            
+            <button
+              onClick={() => setActiveSection('novel')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                activeSection === 'novel' 
+                  ? 'bg-[#5865F2] text-white' 
+                  : 'text-[#B9BBBE] hover:bg-[#4F545C] hover:text-white'
+              }`}
+            >
+              <span className="text-xl">🎮</span>
+              <span className="font-medium">Интерфейс новеллы</span>
+            </button>
           </nav>
           
           {/* Characters List */}
@@ -304,6 +332,28 @@ export default function AdventureLayout({ children: _, onNavigateToLanding, init
                 currentProject={currentProject} 
                 onProjectRequired={() => {
                   setSelectedAction('manage-projects');
+                }}
+              />
+            </div>
+          )}
+
+          {activeSection === 'project-panel' && currentProject && (
+            <div className="mt-4 h-96">
+              <ProjectPanel 
+                project={currentProject}
+                onUpdateProject={setCurrentProject}
+              />
+            </div>
+          )}
+
+          {activeSection === 'novel' && currentProject && (
+            <div className="mt-4 h-96">
+              <NovelInterface 
+                project={currentProject}
+                theme={GAME_THEMES[currentProject.gameTone?.mood || 'dark-noir']}
+                currentScene={currentProject.events?.[0]}
+                onSceneChange={(sceneId) => {
+                  console.log('Scene changed to:', sceneId);
                 }}
               />
             </div>

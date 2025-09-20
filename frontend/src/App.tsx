@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import AdventureLayout from "./components/adventure/AdventureLayout";
 import LandingPage from "./components/LandingPage";
 import StartupWizard from "./components/StartupWizard";
+import NexusDashboard from "./components/NexusDashboard";
 import ServiceWorkerProvider, { PerformanceTracker } from "./components/ui/ServiceWorkerProvider";
 import WorkerProvider from "./components/ui/WorkerManager";
 import type { ProjectSettings } from "./types/project";
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'landing' | 'startup' | 'editor'>('landing');
+  const [currentView, setCurrentView] = useState<'landing' | 'startup' | 'editor' | 'dashboard'>('dashboard');
   const [currentProject, setCurrentProject] = useState<ProjectSettings | null>(null);
 
   useEffect(() => {
@@ -92,6 +93,20 @@ export default function App() {
           <AdventureLayout 
             onNavigateToLanding={handleNavigateToLanding}
             initialProject={currentProject}
+          />
+        </WorkerProvider>
+      </ServiceWorkerProvider>
+    );
+  }
+
+  if (currentView === 'dashboard') {
+    return (
+      <ServiceWorkerProvider>
+        <WorkerProvider>
+          <PerformanceTracker />
+          <NexusDashboard 
+            onNavigateToEditor={handleNavigateToStartup}
+            currentProject={currentProject}
           />
         </WorkerProvider>
       </ServiceWorkerProvider>
