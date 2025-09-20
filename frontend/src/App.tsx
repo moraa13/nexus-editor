@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import AdventureLayout from "./components/adventure/AdventureLayout";
 import LandingPage from "./components/LandingPage";
+import StartupWizard from "./components/StartupWizard";
 import ServiceWorkerProvider, { PerformanceTracker } from "./components/ui/ServiceWorkerProvider";
 import WorkerProvider from "./components/ui/WorkerManager";
+import type { ProjectSettings } from "./types/project";
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'landing' | 'editor'>('landing');
+  const [currentView, setCurrentView] = useState<'landing' | 'startup' | 'editor'>('landing');
+  const [currentProject, setCurrentProject] = useState<ProjectSettings | null>(null);
 
   useEffect(() => {
     // Check if we should show the editor directly
@@ -15,6 +18,11 @@ export default function App() {
     }
   }, []);
 
+  const handleNavigateToStartup = () => {
+    setCurrentView('startup');
+    window.history.pushState({}, '', '/startup');
+  };
+
   const handleNavigateToEditor = () => {
     setCurrentView('editor');
     window.history.pushState({}, '', '/editor');
@@ -22,7 +30,32 @@ export default function App() {
 
   const handleNavigateToLanding = () => {
     setCurrentView('landing');
+    setCurrentProject(null);
     window.history.pushState({}, '', '/');
+  };
+
+  const handleProjectCreated = (projectData: any) => {
+    // Преобразуем данные из StartupWizard в формат ProjectSettings
+    const project: ProjectSettings = {
+      id: Date.now().toString(),
+      name: projectData.name,
+      gameSetting: {
+        genre: projectData.genre,
+        setting: projectData.setting,
+        description: projectData.description
+      },
+      gameTone: {
+        mood: projectData.tone,
+        descriptionStyle: 'detailed'
+      },
+      character: null,
+      events: [],
+      branches: []
+    };
+    
+    setCurrentProject(project);
+    setCurrentView('editor');
+    window.history.pushState({}, '', '/editor');
   };
 
   // Handle browser back/forward buttons
@@ -40,17 +73,31 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  if (currentView === 'editor') {
+  if (currentView === 'startup') {
     return (
       <ServiceWorkerProvider>
         <WorkerProvider>
           <PerformanceTracker />
-          <AdventureLayout onNavigateToLanding={handleNavigateToLanding} />
+          <StartupWizard onComplete={handleProjectCreated} />
         </WorkerProvider>
       </ServiceWorkerProvider>
     );
   }
 
-  return <LandingPage onNavigateToEditor={handleNavigateToEditor} />;
+  if (currentView === 'editor') {
+    return (
+      <ServiceWorkerProvider>
+        <WorkerProvider>
+          <PerformanceTracker />
+          <AdventureLayout 
+            onNavigateToLanding={handleNavigateToLanding}
+            initialProject={currentProject}
+          />
+        </WorkerProvider>
+      </ServiceWorkerProvider>
+    );
+  }
+
+  return <LandingPage onNavigateToEditor={handleNavigateToStartup} />;
 }
 

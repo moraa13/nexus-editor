@@ -1,0 +1,20 @@
+[33m7b47b84[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{0}: reset: moving to HEAD~2
+[33m95bb6af[m HEAD@{1}: reset: moving to HEAD
+[33m95bb6af[m HEAD@{2}: reset: moving to HEAD~2
+[33mf744761[m HEAD@{3}: commit: debug: Add extreme visual debugging and logging for modal visibility
+[33m96166ac[m HEAD@{4}: commit: fix: Restore normal modal styling and clean up debug logs
+[33m95bb6af[m HEAD@{5}: commit: debug: Add extreme visual debugging for modal visibility
+[33m6005078[m HEAD@{6}: commit: debug: Add detailed logging for DemoQuest visibility issue
+[33m7b47b84[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{7}: commit: fix: Restore normal modal styling - debug successful!
+[33m9930aed[m HEAD@{8}: commit: debug: Add extreme visual debugging for modal visibility
+[33m70baea4[m HEAD@{9}: commit: debug: Add logging and simplify DemoQuest rendering
+[33m5e603ed[m HEAD@{10}: commit: feat: Switch to fallback quest data for UI development
+[33m242ab40[m HEAD@{11}: commit: feat: Center DemoQuest modal with smooth animations
+[33m374dd01[m HEAD@{12}: commit: fix: Configure CORS for frontend-backend communication
+[33m96d5649[m HEAD@{13}: commit: refactor: Move AI quest generation to Django backend
+[33m33ffe54[m HEAD@{14}: commit: feat: AI-powered quest generation with centered modal
+[33m7e05471[m HEAD@{15}: commit: fix: DemoQuest characterState.stats undefined access
+[33m0a4a1ce[m HEAD@{16}: commit: fix: DemoQuest undefined character state initialization
+[33m9813c4f[m HEAD@{17}: commit: feat: Event and Quest editor system with Zustand integration
+[33m673caad[m HEAD@{18}: commit: feat: Zustand state management and model unification
+[33mf9cca80[m HEAD@{19}: commit: feat: Добавлен лендинг и улучшения UI
