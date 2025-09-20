@@ -12,7 +12,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Настройка OpenAI
+# Настройка OpenAI для версии 0.28.1
 openai.api_key = getattr(settings, 'OPENAI_API_KEY', None)
 
 

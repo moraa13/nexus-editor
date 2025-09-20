@@ -14,10 +14,12 @@ from .views import (
     start_quest, complete_quest, fail_quest, update_quest_progress,
     get_character_quests, execute_dialogue_option,
     generate_quest, generate_quest_step, cors_test,
+    create_project, get_project_state, update_project_phase, set_current_project, list_projects
 )
 from .auth_views import login, register, logout, user_profile
 from .chat_views import generate_chat_response
 from .ai_views import ChatSessionViewSet, AIConfigViewSet, ai_chat, generate_content, ai_status
+from .views import ai_chat as simple_ai_chat
 
 router = DefaultRouter()
 router.register("projects", ProjectViewSet, basename="project")
@@ -84,9 +86,16 @@ urlpatterns = [
     path("chat/generate/", generate_chat_response),
     
     # AI Chat endpoints
-    path("ai/chat/", ai_chat),
+    path("ai/chat/", simple_ai_chat),
     path("ai/generate-content/", generate_content),
     path("ai/status/", ai_status),
+    
+    # Project State Management endpoints
+    path("project/create/", create_project),
+    path("project/state/", get_project_state),
+    path("project/phase/", update_project_phase),
+    path("project/set-current/", set_current_project),
+    path("project/list/", list_projects),
 ]
 urlpatterns += router.urls
 

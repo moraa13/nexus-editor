@@ -881,3 +881,153 @@ class AIConfig(BaseModel):
     
     def __str__(self) -> str:
         return f"AI Config for {self.project.name}"
+
+
+# Project Session Models for AI Agents
+class ProjectSession(models.Model):
+    """Сессия проекта для ИИ-агентов"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=200, default="Новый проект")
+    genre = models.CharField(max_length=100, default="")
+    setting = models.CharField(max_length=200, default="")
+    tone = models.CharField(max_length=50, default="dark-noir")
+    phase = models.CharField(max_length=20, default="idea")
+    description = models.TextField(blank=True, default="")
+    
+    # Состояние разработки
+    current_focus = models.CharField(max_length=200, blank=True, default="")
+    last_activity = models.TextField(blank=True, default="")
+    
+    # Метаданные
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        db_table = 'project_sessions'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.name} ({self.phase})"
+
+
+class ProjectCharacter(models.Model):
+    """Персонаж проекта"""
+    session = models.ForeignKey(ProjectSession, on_delete=models.CASCADE, related_name='characters')
+    name = models.CharField(max_length=100)
+    role = models.CharField(max_length=50, default="npc")  # hero, npc, villain
+    background = models.TextField(blank=True, default="")
+    motivation = models.TextField(blank=True, default="")
+    fears = models.JSONField(default=list, blank=True)
+    traits = models.JSONField(default=list, blank=True)
+    voices = models.JSONField(default=list, blank=True)
+    speech_style = models.TextField(blank=True, default="")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'project_characters'
+        ordering = ['name']
+    
+    def __str__(self):
+        return f"{self.name} ({self.role})"
+
+
+class ProjectScene(models.Model):
+    """Сцена проекта"""
+    session = models.ForeignKey(ProjectSession, on_delete=models.CASCADE, related_name='scenes')
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, default="")
+    location = models.CharField(max_length=200, blank=True, default="")
+    characters = models.JSONField(default=list, blank=True)
+    events = models.JSONField(default=list, blank=True)
+    choices = models.JSONField(default=list, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'project_scenes'
+        ordering = ['title']
+    
+    def __str__(self):
+        return f"{self.title} ({self.location})"
+
+
+class ProjectQuest(models.Model):
+    """Квест проекта"""
+    session = models.ForeignKey(ProjectSession, on_delete=models.CASCADE, related_name='quests')
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, default="")
+    objectives = models.JSONField(default=list, blank=True)
+    rewards = models.JSONField(default=list, blank=True)
+    consequences = models.JSONField(default=list, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'project_quests'
+        ordering = ['title']
+    
+    def __str__(self):
+        return f"{self.title}"
+
+
+class ProjectMechanics(models.Model):
+    """Игровые механики проекта"""
+    session = models.OneToOneField(ProjectSession, on_delete=models.CASCADE, related_name='mechanics')
+    dice_system = models.CharField(max_length=50, default="d20")
+    stats = models.JSONField(default=list, blank=True)
+    voices = models.JSONField(default=list, blank=True)
+    checks = models.CharField(max_length=100, default="d20 + стат")
+    inventory = models.BooleanField(default=False)
+    reputation = models.BooleanField(default=False)
+    relationships = models.BooleanField(default=False)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'project_mechanics'
+    
+    def __str__(self):
+        return f"Механики для {self.session.name}"
+
+
+class AgentMemory(models.Model):
+    """Память агентов"""
+    session = models.ForeignKey(ProjectSession, on_delete=models.CASCADE, related_name='agent_memories')
+    agent_type = models.CharField(max_length=50)  # narrative, character, quest, world, logic
+    message = models.TextField()
+    response = models.TextField()
+    context = models.JSONField(default=dict, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'agent_memories'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.agent_type}: {self.message[:50]}..."
+
+
+class ProjectTask(models.Model):
+    """Задача проекта"""
+    session = models.ForeignKey(ProjectSession, on_delete=models.CASCADE, related_name='tasks')
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, default="")
+    status = models.CharField(max_length=20, default="pending")  # pending, completed, cancelled
+    priority = models.IntegerField(default=1)  # 1-5
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'project_tasks'
+        ordering = ['-priority', 'title']
+    
+    def __str__(self):
+        return f"{self.title} ({self.status})"

@@ -1326,3 +1326,187 @@ def generate_quest_step(request):
             {'error': f'Quest step generation failed: {str(e)}'}, 
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+# AI Agents Chat endpoint
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def ai_chat(request):
+    """
+    AI Agents chat endpoint
+    POST /api/ai/chat/
+    """
+    try:
+        message = request.data.get('message', '')
+        context = request.data.get('context', {})
+        agent_type = request.data.get('agent_type')  # Опциональный выбор агента
+        
+        if not message:
+            return Response({'error': 'Message is empty'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Используем систему агентов
+        from .ai_agents import agent_manager, AgentType
+        
+        # Если указан конкретный агент
+        selected_agent = None
+        if agent_type:
+            try:
+                selected_agent = AgentType(agent_type)
+            except ValueError:
+                return Response({'error': f'Invalid agent type: {agent_type}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Получаем ответ от агента
+        response = agent_manager.get_response(message, context, selected_agent)
+
+        return Response({
+            'reply': response['message'],
+            'agent_type': response['selected_agent'],
+            'success': response['success'],
+            'model': response['model']
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+# Project State Management API
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def create_project(request):
+    """Создать новый проект"""
+    try:
+        from .project_db_manager import project_db_manager
+        
+        data = request.data
+        name = data.get('name', 'Новый проект')
+        genre = data.get('genre', '')
+        setting = data.get('setting', '')
+        
+        project = project_db_manager.create_project(name, genre, setting)
+        
+        return Response({
+            'project': project_db_manager.get_project_summary(),
+            'message': 'Проект создан успешно'
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def get_project_state(request):
+    """Получить состояние текущего проекта"""
+    try:
+        from .project_db_manager import project_db_manager
+        
+        project_summary = project_db_manager.get_project_summary()
+        
+        if not project_summary:
+            return Response({
+                'project': None,
+                'message': 'Проект не создан'
+            })
+        
+        return Response({
+            'project': project_summary,
+            'message': 'Состояние проекта получено'
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def update_project_phase(request):
+    """Обновить этап разработки проекта"""
+    try:
+        from .project_db_manager import project_db_manager
+        
+        data = request.data
+        phase = data.get('phase')
+        
+        if not phase:
+            return Response({'error': 'Phase is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        valid_phases = ['idea', 'world', 'character', 'scene', 'dialogue', 'branch', 'testplay']
+        if phase not in valid_phases:
+            return Response({'error': f'Invalid phase: {phase}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        success = project_db_manager.update_session(phase=phase)
+        
+        if success:
+            return Response({
+                'phase': phase,
+                'message': f'Этап обновлен на {phase}'
+            })
+        else:
+            return Response({'error': 'Проект не найден'}, status=status.HTTP_404_NOT_FOUND)
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def set_current_project(request):
+    """Установить текущий проект"""
+    try:
+        from .project_db_manager import project_db_manager
+        
+        data = request.data
+        session_id = data.get('session_id')
+        
+        if not session_id:
+            return Response({'error': 'session_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        success = project_db_manager.set_current_session(session_id)
+        
+        if success:
+            return Response({
+                'session_id': session_id,
+                'project': project_db_manager.get_project_summary(),
+                'message': 'Проект установлен как текущий'
+            })
+        else:
+            return Response({'error': 'Проект не найден'}, status=status.HTTP_404_NOT_FOUND)
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def list_projects(request):
+    """Получить список всех проектов"""
+    try:
+        from .project_db_manager import project_db_manager
+        
+        projects = project_db_manager.list_sessions()
+        
+        return Response({
+            'projects': projects,
+            'message': f'Найдено {len(projects)} проектов'
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

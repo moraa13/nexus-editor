@@ -2,10 +2,9 @@
 URLs for AI app
 """
 from django.urls import path
-from .views import AIChatView, AIContentGenerationView, AIStatusView
+from .simple_views import SimpleAIChatView, SimpleAIStatusView
 
 urlpatterns = [
-    path('chat/', AIChatView.as_view(), name='ai-chat'),
-    path('generate-content/', AIContentGenerationView.as_view(), name='ai-generate-content'),
-    path('status/', AIStatusView.as_view(), name='ai-status'),
+    path('chat/', SimpleAIChatView.as_view(), name='ai-chat'),
+    path('status/', SimpleAIStatusView.as_view(), name='ai-status'),
 ]
